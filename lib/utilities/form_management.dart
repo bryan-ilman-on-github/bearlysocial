@@ -4,14 +4,14 @@ import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class FormManagement {
-  static bool validateEmail({
-    required String email,
+  static bool validateEmailAddress({
+    required String emailAddress,
   }) {
     final RegExp emailRegExp = RegExp(
       r'^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$',
     );
 
-    return emailRegExp.hasMatch(email);
+    return emailRegExp.hasMatch(emailAddress);
   }
 
   /// Parses a JSON-formatted string into a list of strings.

@@ -22,7 +22,7 @@ Map<String, String> enFragMapping = {
   TranslationKey.usernameLabel.name: 'Username',
   TranslationKey.passwordLabel.name: 'Password',
   TranslationKey.passwordConfirmationLabel.name: 'Password Confirmation',
-  TranslationKey.emailLabel.name: 'Email',
+  TranslationKey.emailAddressLabel.name: 'Email Address',
   TranslationKey.artificialIntelligenceLabel.name: 'Artificial Intelligence',
   TranslationKey.astronomyLabel.name: 'Astronomy',
   TranslationKey.badmintonLabel.name: 'Badminton',

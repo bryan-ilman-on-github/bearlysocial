@@ -21,7 +21,7 @@ class AppColor {
   static const Color lightRed = Color(0xFFFEEFEC);
 
   /// Heavy red color. Value: Color(0xFFEE002C).
-  static const Color heavyRed = Color(0xFFEE002C);
+  static const Color heavyRed = Color(0xFFFF2400);
 
   /// Light yellow color. Value: Color(0xFFFFFC8C).
   static const Color lightYellow = Color(0xFFFFFC8C);

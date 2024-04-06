@@ -20,7 +20,7 @@ enum TranslationKey {
   usernameLabel,
   passwordLabel,
   passwordConfirmationLabel,
-  emailLabel,
+  emailAddressLabel,
   artificialIntelligenceLabel,
   astronomyLabel,
   badmintonLabel,

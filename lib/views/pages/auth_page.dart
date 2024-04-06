@@ -1,18 +1,18 @@
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/views/sections/hook_section.dart';
+import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
+import 'package:bearlysocial/views/sections/hero_section.dart';
 import 'package:bearlysocial/views/sections/otp_section.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AuthPage extends StatefulWidget {
+class AuthPage extends ConsumerStatefulWidget {
   const AuthPage({super.key});
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
+  ConsumerState<AuthPage> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage> {
-  bool _showHook = true;
-
+class _AuthPageState extends ConsumerState<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,14 +47,19 @@ class _AuthPageState extends State<AuthPage> {
                 Stack(
                   children: <Widget>[
                     AnimatedOpacity(
-                      opacity: _showHook ? 1.0 : 0.0,
+                      opacity: ref.watch(authenticationPageEmailAddress).isEmpty
+                          ? 1.0
+                          : 0.0,
                       duration: const Duration(
                         milliseconds: AnimationDuration.medium,
                       ),
-                      child: const HookSection(),
+                      child: const HeroSection(),
                     ),
                     AnimatedOpacity(
-                      opacity: _showHook ? 0.0 : 1.0,
+                      opacity:
+                          ref.watch(authenticationPageEmailAddress).isNotEmpty
+                              ? 1.0
+                              : 0.0,
                       duration: const Duration(
                         milliseconds: AnimationDuration.medium,
                       ),
@@ -63,11 +68,13 @@ class _AuthPageState extends State<AuthPage> {
                           milliseconds: AnimationDuration.medium,
                         ),
                         transform: Matrix4.translationValues(
-                          _showHook ? MediaQuery.of(context).size.width / 2 : 0,
+                          ref.watch(authenticationPageEmailAddress).isNotEmpty
+                              ? 0
+                              : MediaQuery.of(context).size.width / 2,
                           0,
                           0,
                         ),
-                        child: const OTP_Section(),
+                        child: const OTPsection(),
                       ),
                     ),
                   ],

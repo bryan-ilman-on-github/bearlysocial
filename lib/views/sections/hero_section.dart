@@ -1,39 +1,42 @@
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
+import 'package:bearlysocial/constants/endpoint.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
+import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
+import 'package:bearlysocial/utilities/api.dart';
 import 'package:bearlysocial/utilities/form_management.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HookSection extends StatefulWidget {
-  const HookSection({super.key});
+class HeroSection extends ConsumerStatefulWidget {
+  const HeroSection({super.key});
 
   @override
-  State<HookSection> createState() => _HookSectionState();
+  ConsumerState<HeroSection> createState() => _HeroSectionState();
 }
 
-class _HookSectionState extends State<HookSection> {
-  bool _showFirst = true;
-
+class _HeroSectionState extends ConsumerState<HeroSection> {
   bool _blockInput = false;
 
-  String? _emailErrorText;
+  final FocusNode _emailAddressFocusNode = FocusNode();
+  final TextEditingController _emailAddressController = TextEditingController();
 
-  final FocusNode _emailFocusNode = FocusNode();
-  final TextEditingController _emailController = TextEditingController();
+  String? _emailAddressErrorText;
 
   @override
   void initState() {
     super.initState();
-    _emailFocusNode.addListener(() {
+
+    _emailAddressFocusNode.addListener(() {
       setState(() {});
     });
   }
 
   @override
   void dispose() {
-    _emailFocusNode.dispose();
+    _emailAddressFocusNode.dispose();
 
     super.dispose();
   }
@@ -41,37 +44,23 @@ class _HookSectionState extends State<HookSection> {
   void _continue() async {
     _blockInput = true;
 
-    bool emailIsvalid = FormManagement.validateEmail(
-      email: _emailController.text,
+    final String emailAddress = _emailAddressController.text;
+
+    bool emailAddressIsvalid = FormManagement.validateEmailAddress(
+      emailAddress: emailAddress,
     );
 
-    if (emailIsvalid) {
-      // String hashedEmail = DatabaseOperation.getHash(
-      //   input: _emailController.text,
-      // );
-
-      // final Response httpResponse = await API.makeRequest(
-      //   endpoint: '',
-      //   body: {
-      //     'id': hashedEmail,
-      //   },
-      // );
-    } else {
+    if (emailAddressIsvalid) {
       setState(() {
-        _emailErrorText = 'Please type your valid email.';
+        _emailAddressErrorText = null;
       });
 
-      _blockInput = false;
+      ref.read(setAuthenticationPageEmailAddress)(emailAddress: emailAddress);
+    } else {
+      setState(() {
+        _emailAddressErrorText = 'Please type your valid email address.';
+      });
     }
-  }
-
-  void _storeAccessNumber({
-    required String id,
-    required String responseBody,
-  }) {
-    setState(() {
-      _emailErrorText = null;
-    });
 
     _blockInput = false;
   }
@@ -100,10 +89,10 @@ class _HookSectionState extends State<HookSection> {
           height: WhiteSpaceSize.veryLarge,
         ),
         UnderlinedTextField(
-          label: TranslationKey.emailLabel.name.tr(),
-          controller: _emailController,
-          focusNode: _emailFocusNode,
-          errorText: _emailErrorText,
+          label: TranslationKey.emailAddressLabel.name.tr(),
+          controller: _emailAddressController,
+          focusNode: _emailAddressFocusNode,
+          errorText: _emailAddressErrorText,
         ),
         const SizedBox(
           height: WhiteSpaceSize.large,

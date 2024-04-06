@@ -1,13 +1,19 @@
 /// A class that defines the endpoints for the APIs.
 class Endpoint {
-  /// The endpoint for signing up a new user.
+  /// This endpoint is for signing up a new user.
   static const String signUp = '$_apiBasePath/sign-up';
 
-  /// The endpoint for signing in an existing user.
+  /// This endpoint is for signing in an existing user.
   static const String signIn = '$_apiBasePath/sign-in';
 
-  /// The endpoint for validating a user's token.
+  /// This endpoint is for validating a user's token.
   static const String validateToken = '$_apiBasePath/validate-token';
+
+  /// This endpoint is for sending an OTP via email.
+  static const String sendOTPviaEmail = '$_apiBasePath/send-otp-via-email';
+
+  /// This endpoint is for verifying an OTP.
+  static const String verifyOTP = '$_apiBasePath/verify-otp';
 }
 
 /// The scheme for the URL
