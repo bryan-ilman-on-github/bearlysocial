@@ -23,11 +23,14 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
   bool _enabled = true;
 
   final List<String> _otp = ['', '', '', '', '', ''];
-  String otpErrorText = '';
+  String _otpErrorText = '';
 
   void _goBack() {
+    _otpErrorText = '';
+
+    _enabled = true;
+
     ref.read(setAuthenticationPageEmailAddress)(emailAddress: '');
-    otpErrorText = '';
   }
 
   @override
@@ -87,36 +90,41 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                       },
                     );
 
-                    print(httpResponse.statusCode);
-                    print(httpResponse.body);
                     if (httpResponse.statusCode == 200) {
+                      ref.read(setAuthenticationPageEmailAddress)(
+                          emailAddress: '');
+
                       ref.read(enterApp)();
                     } else {
                       final message = jsonDecode(httpResponse.body)['message'];
-                      if (message != null) otpErrorText = message;
-
-                      dynamic cooldownTime =
-                          jsonDecode(httpResponse.body)['cooldown_time'];
-                      dynamic remainingMinutes;
-
-                      if (cooldownTime != null) {
-                        DateTime now = DateTime.now();
-                        cooldownTime =
-                            DateTime.fromMillisecondsSinceEpoch(cooldownTime);
-                        remainingMinutes =
-                            now.difference(cooldownTime).inMinutes;
-                        remainingMinutes = (remainingMinutes / 60).ceil();
+                      if (message != null) {
+                        setState(() {
+                          _otpErrorText = message;
+                          _enabled = true;
+                        });
                       } else {
-                        remainingMinutes = 'unknown';
+                        dynamic cooldownTime =
+                            jsonDecode(httpResponse.body)['cooldown_time'];
+                        dynamic remainingMinutes;
+
+                        if (cooldownTime != null) {
+                          cooldownTime = int.parse(cooldownTime);
+                          DateTime now = DateTime.now();
+                          cooldownTime =
+                              DateTime.fromMillisecondsSinceEpoch(cooldownTime);
+                          remainingMinutes =
+                              cooldownTime.difference(now).inMinutes;
+                          if (remainingMinutes < 0) remainingMinutes = 0;
+                        } else {
+                          remainingMinutes = 'unknown';
+                        }
+
+                        setState(() {
+                          _otpErrorText =
+                              'Email requests exceeded. Retry in $remainingMinutes minute(s).';
+                        });
                       }
-
-                      otpErrorText =
-                          'Too many requests have been made for ${ref.read(authenticationPageEmailAddress)}. Please wait approximately $remainingMinutes minutes before trying again.';
                     }
-
-                    setState(() {
-                      _enabled = true;
-                    });
                   }
                 },
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -159,11 +167,20 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
         const SizedBox(
           height: WhiteSpaceSize.verySmall,
         ),
-        Text(
-          otpErrorText.isEmpty ? "\n" : otpErrorText,
-          maxLines: 4,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        _enabled
+            ? Text(
+                _otpErrorText.isEmpty ? "\n" : _otpErrorText,
+                maxLines: 4,
+                style: Theme.of(context).textTheme.bodySmall,
+              )
+            : SizedBox(
+                width: SideSize.verySmall,
+                height: SideSize.verySmall,
+                child: CircularProgressIndicator(
+                  strokeWidth: ThicknessSize.large,
+                  color: Theme.of(context).focusColor,
+                ),
+              ),
         const SizedBox(
           height: WhiteSpaceSize.veryLarge,
         ),

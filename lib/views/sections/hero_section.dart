@@ -80,25 +80,26 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
         dynamic remainingMinutes;
 
         if (cooldownTime != null) {
+          cooldownTime = int.parse(cooldownTime);
           DateTime now = DateTime.now();
           cooldownTime = DateTime.fromMillisecondsSinceEpoch(cooldownTime);
-          remainingMinutes = now.difference(cooldownTime).inMinutes;
-          remainingMinutes = (remainingMinutes / 60).ceil();
+          remainingMinutes = cooldownTime.difference(now).inMinutes;
+          if (remainingMinutes < 0) remainingMinutes = 0;
         } else {
           remainingMinutes = 'unknown';
         }
 
-        _emailAddressErrorText =
-            'Too many requests have been made for $emailAddress. Please wait approximately $remainingMinutes minutes before trying again.';
-
-        _blockInput = false;
+        setState(() {
+          _emailAddressErrorText =
+              'Email requests exceeded. Retry in $remainingMinutes minute(s).';
+          _blockInput = false;
+        });
       }
     } else {
       setState(() {
         _emailAddressErrorText = 'Please type your valid email address.';
+        _blockInput = false;
       });
-
-      _blockInput = false;
     }
   }
 
@@ -126,6 +127,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
           height: WhiteSpaceSize.veryLarge,
         ),
         UnderlinedTextField(
+          enabled: ref.watch(authenticationPageEmailAddress).isEmpty,
           label: TranslationKey.emailAddressLabel.name.tr(),
           controller: _emailAddressController,
           focusNode: _emailAddressFocusNode,
@@ -140,7 +142,11 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
           borderRadius: BorderRadius.circular(
             CurvatureSize.large,
           ),
-          callbackFunction: _blockInput ? null : _continue,
+          callbackFunction: ref.watch(authenticationPageEmailAddress).isEmpty
+              ? _blockInput
+                  ? null
+                  : _continue
+              : null,
           shadow: Shadow.medium,
           child: _blockInput
               ? SizedBox(
