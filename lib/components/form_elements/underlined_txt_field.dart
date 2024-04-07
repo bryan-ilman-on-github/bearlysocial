@@ -38,6 +38,7 @@ class _UnderlinedTextFieldState extends State<UnderlinedTextField> {
                   : Theme.of(context).textTheme.bodyMedium?.color,
             ),
         errorText: widget.errorText,
+        errorMaxLines: 2,
         errorStyle: Theme.of(context).textTheme.bodySmall,
         errorBorder: const UnderlineInputBorder(
           borderSide: BorderSide(

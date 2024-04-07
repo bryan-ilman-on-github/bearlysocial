@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
@@ -5,10 +7,12 @@ import 'package:bearlysocial/constants/endpoint.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
 import 'package:bearlysocial/utilities/api.dart';
+import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/form_management.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart';
 
 class HeroSection extends ConsumerStatefulWidget {
   const HeroSection({super.key});
@@ -55,14 +59,47 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
         _emailAddressErrorText = null;
       });
 
-      ref.read(setAuthenticationPageEmailAddress)(emailAddress: emailAddress);
+      String id = DatabaseOperation.getSHA256(
+        input: emailAddress,
+      ).substring(0, 16);
+
+      final Response httpResponse = await API.makeRequest(
+        endpoint: Endpoint.sendOTPviaEmail,
+        body: {
+          'id': id,
+          'email_address': emailAddress,
+        },
+      );
+
+      if (httpResponse.statusCode == 200) {
+        _blockInput = false;
+
+        ref.read(setAuthenticationPageEmailAddress)(emailAddress: emailAddress);
+      } else {
+        dynamic cooldownTime = jsonDecode(httpResponse.body)['cooldown_time'];
+        dynamic remainingMinutes;
+
+        if (cooldownTime != null) {
+          DateTime now = DateTime.now();
+          cooldownTime = DateTime.fromMillisecondsSinceEpoch(cooldownTime);
+          remainingMinutes = now.difference(cooldownTime).inMinutes;
+          remainingMinutes = (remainingMinutes / 60).ceil();
+        } else {
+          remainingMinutes = 'unknown';
+        }
+
+        _emailAddressErrorText =
+            'Too many requests have been made for $emailAddress. Please wait approximately $remainingMinutes minutes before trying again.';
+
+        _blockInput = false;
+      }
     } else {
       setState(() {
         _emailAddressErrorText = 'Please type your valid email address.';
       });
-    }
 
-    _blockInput = false;
+      _blockInput = false;
+    }
   }
 
   @override

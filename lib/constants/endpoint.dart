@@ -12,8 +12,8 @@ class Endpoint {
   /// This endpoint is for sending an OTP via email.
   static const String sendOTPviaEmail = '$_apiBasePath/send-otp-via-email';
 
-  /// This endpoint is for verifying an OTP.
-  static const String verifyOTP = '$_apiBasePath/verify-otp';
+  /// This endpoint is for validating an OTP.
+  static const String validateOTP = '$_apiBasePath/validate-otp';
 }
 
 /// The scheme for the URL

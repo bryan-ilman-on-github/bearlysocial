@@ -83,7 +83,7 @@ class DatabaseOperation {
   /// Generates a SHA-256 hash of the input string.
   ///
   /// The `input` parameter is the string to be hashed.
-  static String getHash({
+  static String getSHA256({
     required String input,
   }) {
     var bytes = utf8.encode(input);

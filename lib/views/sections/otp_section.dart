@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/endpoint.dart';
 import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
+import 'package:bearlysocial/providers/auth_state.dart';
 import 'package:bearlysocial/utilities/api.dart';
+import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart';
 
 class OTPsection extends ConsumerStatefulWidget {
   const OTPsection({super.key});
@@ -20,37 +25,9 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
   final List<String> _otp = ['', '', '', '', '', ''];
   String otpErrorText = '';
 
-  String instruction = '';
-  String explanation = '';
-
-  @override
-  void initState() {
-    super.initState();
-
-    API.makeRequest(
-      endpoint: Endpoint.sendOTPviaEmail,
-      body: {
-        'emailAddress': ref.read(authenticationPageEmailAddress),
-      },
-    ).then((httpResponse) {
-      if (httpResponse.statusCode == 200) {
-        instruction = 'Please check your email.';
-        explanation = "We've sent a one-time password (OTP) to ${ref.read(
-          authenticationPageEmailAddress,
-        )}.";
-      }
-
-      if (httpResponse.statusCode == 429) {
-        instruction = 'Please try again later.';
-        explanation = 'Too many requests have been made for ${ref.read(
-          authenticationPageEmailAddress,
-        )}. Please wait approximately 24 minutes before trying again.';
-      }
-    });
-  }
-
   void _goBack() {
     ref.read(setAuthenticationPageEmailAddress)(emailAddress: '');
+    otpErrorText = '';
   }
 
   @override
@@ -59,14 +36,14 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          instruction,
+          'Please check your email.',
           maxLines: 2,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontSize: 32.0,
               ),
         ),
         Text(
-          explanation,
+          "We've sent a one-time password (OTP) to ${ref.watch(authenticationPageEmailAddress)}.",
           maxLines: 4,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
@@ -82,12 +59,12 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
               width: SideSize.small * 1.5,
               child: TextField(
                 enabled: _enabled,
-                textAlign: TextAlign.center,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(1),
                   FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                 ],
+                textAlign: TextAlign.center,
                 onChanged: (value) async {
                   _otp[index] = value;
 
@@ -98,13 +75,48 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                       _enabled = false;
                     });
 
-                    API.makeRequest(
-                      endpoint: Endpoint.verifyOTP,
+                    String id = DatabaseOperation.getSHA256(
+                      input: ref.read(authenticationPageEmailAddress),
+                    ).substring(0, 16);
+
+                    final Response httpResponse = await API.makeRequest(
+                      endpoint: Endpoint.validateOTP,
                       body: {
-                        'emailAddress':
-                            ref.read(authenticationPageEmailAddress),
+                        'id': id,
+                        'otp': _otp.join(),
                       },
-                    ).then((httpResponse) => null);
+                    );
+
+                    print(httpResponse.statusCode);
+                    print(httpResponse.body);
+                    if (httpResponse.statusCode == 200) {
+                      ref.read(enterApp)();
+                    } else {
+                      final message = jsonDecode(httpResponse.body)['message'];
+                      if (message != null) otpErrorText = message;
+
+                      dynamic cooldownTime =
+                          jsonDecode(httpResponse.body)['cooldown_time'];
+                      dynamic remainingMinutes;
+
+                      if (cooldownTime != null) {
+                        DateTime now = DateTime.now();
+                        cooldownTime =
+                            DateTime.fromMillisecondsSinceEpoch(cooldownTime);
+                        remainingMinutes =
+                            now.difference(cooldownTime).inMinutes;
+                        remainingMinutes = (remainingMinutes / 60).ceil();
+                      } else {
+                        remainingMinutes = 'unknown';
+                      }
+
+                      otpErrorText =
+                          'Too many requests have been made for ${ref.read(authenticationPageEmailAddress)}. Please wait approximately $remainingMinutes minutes before trying again.';
+                    }
+
+                    setState(() {
+                      _enabled = true;
+                    });
                   }
                 },
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
