@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class SessionsPage extends StatefulWidget {
+class ProfilePage extends StatefulWidget {
   final ScrollController controller;
 
-  const SessionsPage({
+  const ProfilePage({
     super.key,
     required this.controller,
   });
 
   @override
-  State<SessionsPage> createState() => _SessionsPageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _SessionsPageState extends State<SessionsPage> {
+class _ProfilePageState extends State<ProfilePage> {
   final List<Widget> _children = [];
 
   @override

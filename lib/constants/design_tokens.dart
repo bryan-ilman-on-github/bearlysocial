@@ -47,6 +47,12 @@ class Shadow {
     blurRadius: 16,
     spreadRadius: 2,
   );
+
+  /// Small shadow style.
+  static BoxShadow small = BoxShadow(
+    color: Colors.grey.withOpacity(0.4),
+    blurRadius: 2,
+  );
 }
 
 /// Font family used in the app. Value: 'Mukta'.

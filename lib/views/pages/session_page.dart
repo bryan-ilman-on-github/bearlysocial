@@ -1,16 +1,13 @@
+import 'package:bearlysocial/components/bars/nav_bar.dart' as app_nav_bar;
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/views/pages/explore_page.dart';
 import 'package:bearlysocial/views/pages/favorites_page.dart';
-import 'package:bearlysocial/components/bars/nav_bar.dart' as app_nav_bar;
-import 'package:bearlysocial/views/pages/page.dart';
+import 'package:bearlysocial/views/pages/profile_page.dart';
+import 'package:bearlysocial/views/pages/schedule_page.dart';
 import 'package:bearlysocial/views/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 
 class SessionPage extends StatefulWidget {
-  /// [SessionPage] is a [StatefulWidget] responsible for managing post-authentication pages,
-  /// allowing users to navigate between various pages using an [IndexedStack].
-  /// It features a [app_nav_bar.NavigationBar] and a [FloatingActionButton] for scrolling to the top.
-
   const SessionPage({super.key});
 
   @override
@@ -18,14 +15,13 @@ class SessionPage extends StatefulWidget {
 }
 
 class _SessionPage extends State<SessionPage> {
+  Map<String, Map<String, dynamic>> _navItems = {};
   List<Widget> _pages = [];
 
   int _selectedIndex = 0;
 
   late ScrollController _controller;
   bool _showingScrollButton = false;
-
-  Map<String, Map<String, dynamic>> _navItems = {};
 
   ScrollController _createController() {
     final ScrollController scrollController = ScrollController();
@@ -69,7 +65,10 @@ class _SessionPage extends State<SessionPage> {
       FavoritesPage(
         controller: _createController(),
       ),
-      SessionsPage(
+      SchedulePage(
+        controller: _createController(),
+      ),
+      ProfilePage(
         controller: _createController(),
       ),
       SettingsPage(
@@ -93,16 +92,20 @@ class _SessionPage extends State<SessionPage> {
         'normalIcon': Icons.favorite_border,
         'highlightedIcon': Icons.favorite,
       },
-      'Sessions': {
+      'Schedule': {
         'normalIcon': Icons.calendar_today_outlined,
         'highlightedIcon': Icons.calendar_today,
+      },
+      'Profile': {
+        'normalIcon': Icons.person_outlined,
+        'highlightedIcon': Icons.person,
       },
       'Settings': {
         'normalIcon': Icons.settings_outlined,
         'highlightedIcon': Icons.settings,
       },
     }.map((key, value) {
-      var index = _pages.indexWhere(
+      final int index = _pages.indexWhere(
         (page) => page.runtimeType.toString() == '${key}Page',
       );
 
@@ -124,9 +127,10 @@ class _SessionPage extends State<SessionPage> {
       ),
       floatingActionButton: _showingScrollButton
           ? FloatingActionButton(
-              onPressed: _scrollToTop,
-              elevation: ElevationSize.small,
+              shape: const CircleBorder(),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              elevation: ElevationSize.small,
+              onPressed: _scrollToTop,
               mini: true,
               child: Icon(
                 Icons.arrow_upward,

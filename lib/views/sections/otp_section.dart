@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
+import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/endpoint.dart';
 import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
@@ -92,7 +93,17 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
 
                     if (httpResponse.statusCode == 200) {
                       ref.read(setAuthenticationPageEmailAddress)(
-                          emailAddress: '');
+                        emailAddress: '',
+                      );
+
+                      DatabaseOperation.insertTransactions(
+                        pairs: {
+                          DatabaseKey.id.name: id,
+                          DatabaseKey.token.name: jsonDecode(
+                            httpResponse.body,
+                          )[DatabaseKey.token.name],
+                        },
+                      );
 
                       ref.read(enterApp)();
                     } else {
@@ -173,7 +184,8 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                 maxLines: 4,
                 style: Theme.of(context).textTheme.bodySmall,
               )
-            : SizedBox(
+            : Container(
+                margin: const EdgeInsets.only(left: MarginSize.small),
                 width: SideSize.verySmall,
                 height: SideSize.verySmall,
                 child: CircularProgressIndicator(
