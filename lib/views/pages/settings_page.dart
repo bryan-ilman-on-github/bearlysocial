@@ -40,7 +40,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             SettingButton(
               icon: Icons.delete_outlined,
               label: TranslationKey.deleteAccountButton.name.tr(),
-              callbackFunction: () {},
+              callbackFunction: ref.read(deleteAccount),
               splashColor: AppColor.lightRed,
               contentColor: AppColor.heavyRed,
             ),
@@ -49,7 +49,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
             SplashButton(
               verticalPadding: PaddingSize.small,
-              callbackFunction: ref.watch(exitApp),
+              callbackFunction: ref.read(exitApp),
               buttonColor: Colors.transparent,
               borderColor: AppColor.heavyRed,
               borderRadius: BorderRadius.circular(

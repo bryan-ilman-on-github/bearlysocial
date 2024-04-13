@@ -39,23 +39,6 @@ class DropdownOperation {
     return tags;
   }
 
-  static List<String> addLabel({
-    required Map<String, dynamic> menu,
-    required String labelToAdd,
-    required List<String> labelCollection,
-  }) =>
-      menu.containsKey(labelToAdd) && labelCollection.length >= 4
-          ? <String>[...labelCollection..removeAt(0), labelToAdd]
-          : menu.containsKey(labelToAdd)
-              ? <String>[...labelCollection, labelToAdd]
-              : labelCollection;
-
-  static List<String> removeLabel({
-    required String labelToRemove,
-    required List<String> labelCollection,
-  }) =>
-      List.from(labelCollection)..remove(labelToRemove);
-
   static Map<String, TranslationKey> get allInterests {
     final List<TranslationKey> interestKeys = [
       TranslationKey.artificialIntelligenceLabel,

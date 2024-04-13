@@ -38,6 +38,26 @@ class AuthenticationStateNotifier extends StateNotifier<bool> {
       exitApp();
     }
   }
+
+  Future<void> deleteAccount() async {
+    late String txnId, txnToken;
+
+    [txnId, txnToken] = DatabaseOperation.retrieveTransactions(
+      keys: [
+        DatabaseKey.id.name,
+        DatabaseKey.token.name,
+      ],
+    );
+
+    final Response httpResponse = await API.makeRequest(
+      endpoint: Endpoint.deleteAccount,
+      body: {'id': txnId, 'token': txnToken},
+    );
+
+    if (httpResponse.statusCode == 200) {
+      exitApp();
+    }
+  }
 }
 
 final authenticationStateNotifierProvider =
@@ -59,4 +79,8 @@ final exitApp = Provider((ref) {
 
 final validateToken = Provider((ref) {
   return ref.read(authenticationStateNotifierProvider.notifier).validateToken;
+});
+
+final deleteAccount = Provider((ref) {
+  return ref.read(authenticationStateNotifierProvider.notifier).deleteAccount;
 });

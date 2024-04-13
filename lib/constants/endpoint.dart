@@ -14,6 +14,9 @@ class Endpoint {
 
   /// This endpoint is for validating an OTP.
   static const String validateOTP = '$_apiBasePath/validate-otp';
+
+  /// This endpoint is for deleting account.
+  static const String deleteAccount = '$_apiBasePath/delete-account';
 }
 
 /// The scheme for the URL
