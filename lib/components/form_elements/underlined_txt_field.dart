@@ -1,5 +1,6 @@
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class UnderlinedTextField extends StatefulWidget {
   final bool enabled;
@@ -8,7 +9,6 @@ class UnderlinedTextField extends StatefulWidget {
   final FocusNode focusNode;
   final String? errorText;
 
-  /// [UnderlinedTextField] is a [StatefulWidget] representing a text input field with an underline.
   const UnderlinedTextField({
     super.key,
     this.enabled = true,
@@ -17,6 +17,7 @@ class UnderlinedTextField extends StatefulWidget {
     required this.focusNode,
     this.errorText,
   });
+
   @override
   State<UnderlinedTextField> createState() => _UnderlinedTextFieldState();
 }
@@ -29,6 +30,12 @@ class _UnderlinedTextFieldState extends State<UnderlinedTextField> {
       focusNode: widget.focusNode,
       controller: widget.controller,
       style: Theme.of(context).textTheme.bodyMedium,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(320),
+        FilteringTextInputFormatter.allow(
+          RegExp(r'[a-zA-Z0-9@_.]'),
+        ),
+      ],
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: Theme.of(context).textTheme.titleLarge?.copyWith(

@@ -12,7 +12,7 @@ import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/dropdown_operation.dart';
 import 'package:bearlysocial/utilities/form_management.dart';
 import 'package:bearlysocial/utilities/user_permission.dart';
-import 'package:bearlysocial/views/pages/selfie_screen.dart';
+import 'package:bearlysocial/views/screens/selfie_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -74,14 +74,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ),
     );
 
+    _interestController.text = '';
+    _langController.text = '';
+
     _instaLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.instagramUsername.name,
+      key: DatabaseKey.instagramHandle.name,
     );
     _facebookLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.facebookUsername.name,
+      key: DatabaseKey.facebookHandle.name,
     );
     _linkedinLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.linkedinUsername.name,
+      key: DatabaseKey.linkedinHandle.name,
     );
 
     changesNotSaved = false;
@@ -312,7 +315,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   SplashButton(
                     horizontalPadding: PaddingSize.veryLarge,
                     verticalPadding: PaddingSize.small,
-                    callbackFunction: _syncWithDatabase,
+                    callbackFunction: () => setState(() {
+                      _syncWithDatabase();
+                    }),
                     buttonColor: Colors.transparent,
                     borderColor: Colors.transparent,
                     borderRadius: BorderRadius.circular(

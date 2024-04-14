@@ -8,11 +8,11 @@ extension Getter on SocialMedia {
   String get domain {
     switch (this) {
       case SocialMedia.instagram:
-        return 'https:/www.instagram.com';
+        return 'https:/www.instagram.com/';
       case SocialMedia.facebook:
-        return 'https:/www.facebook.com';
+        return 'https:/www.facebook.com/';
       case SocialMedia.linkedin:
-        return 'https:/www.linkedin.com';
+        return 'https:/www.linkedin.com/in/';
       default:
         return '';
     }

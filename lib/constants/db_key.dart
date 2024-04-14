@@ -20,14 +20,14 @@ enum DatabaseKey {
   /// The key for the 'interests' field in the database.
   interests,
 
-  /// The key for the 'instagramUsername' field in the database.
-  instagramUsername,
+  /// The key for the 'instagramHandle' field in the database.
+  instagramHandle,
 
-  /// The key for the 'facebookUsername' field in the database.
-  facebookUsername,
+  /// The key for the 'facebookHandle' field in the database.
+  facebookHandle,
 
-  /// The key for the 'linkedinUsername' field in the database.
-  linkedinUsername,
+  /// The key for the 'linkedinHandle' field in the database.
+  linkedinHandle,
 
   /// The key for the 'email' field in the database.
   email,

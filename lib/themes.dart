@@ -80,6 +80,7 @@ IconThemeData get _iconTheme {
 
 DropdownMenuThemeData get _dropdownMenuTheme {
   return DropdownMenuThemeData(
+    textStyle: _bodyMedium,
     inputDecorationTheme: InputDecorationTheme(
       hintStyle: _bodyMedium,
       enabledBorder: OutlineInputBorder(
@@ -101,9 +102,6 @@ DropdownMenuThemeData get _dropdownMenuTheme {
       ),
     ),
     menuStyle: MenuStyle(
-      elevation: const MaterialStatePropertyAll(
-        ElevationSize.large,
-      ),
       shape: MaterialStatePropertyAll(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
@@ -115,11 +113,17 @@ DropdownMenuThemeData get _dropdownMenuTheme {
           ),
         ),
       ),
+      backgroundColor: MaterialStatePropertyAll(
+        _focusColor,
+      ),
       maximumSize: const MaterialStatePropertyAll(
         Size(
           double.infinity,
           SideSize.veryLarge,
         ),
+      ),
+      elevation: const MaterialStatePropertyAll(
+        ElevationSize.large,
       ),
     ),
   );
