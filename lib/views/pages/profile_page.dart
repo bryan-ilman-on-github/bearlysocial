@@ -18,6 +18,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img_lib;
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   final ScrollController controller;
@@ -57,20 +58,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     _canvas = null;
 
     _firstNameController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.firstName.name,
+      key: DatabaseKey.first_name.name,
     );
     _lastNameController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.lastName.name,
+      key: DatabaseKey.last_name.name,
     );
 
     _interestCollection = FormManagement.stringToList(
       jsonListString: DatabaseOperation.retrieveTransaction(
-        key: DatabaseKey.interests.name,
+        key: DatabaseKey.interest.name,
       ),
     );
     _langCollection = FormManagement.stringToList(
       jsonListString: DatabaseOperation.retrieveTransaction(
-        key: DatabaseKey.languages.name,
+        key: DatabaseKey.lang.name,
       ),
     );
 
@@ -78,13 +79,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     _langController.text = '';
 
     _instaLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.instagramHandle.name,
+      key: DatabaseKey.insta_handle.name,
     );
     _facebookLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.facebookHandle.name,
+      key: DatabaseKey.fb_handle.name,
     );
     _linkedinLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.linkedinHandle.name,
+      key: DatabaseKey.linkedin_handle.name,
     );
 
     changesNotSaved = false;
@@ -207,8 +208,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         child: SingleChildScrollView(
           key: _key,
           controller: widget.controller,
-          padding: const EdgeInsets.all(
-            PaddingSize.medium,
+          padding: const EdgeInsets.symmetric(
+            horizontal: PaddingSize.medium,
           ),
           child: Column(
             children: [
@@ -216,10 +217,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   changesNotSaved ? 'changes not saved' : '',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: TextSize.medium,
+                      ),
                 ),
               ),
               const SizedBox(
-                height: WhiteSpaceSize.verySmall * 2.0,
+                height: WhiteSpaceSize.verySmall,
               ),
               ProfilePicture(
                 imageSource: _canvas,
@@ -309,41 +314,130 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.large,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SplashButton(
-                    horizontalPadding: PaddingSize.veryLarge,
-                    verticalPadding: PaddingSize.small,
-                    callbackFunction: () => setState(() {
-                      _syncWithDatabase();
-                    }),
-                    buttonColor: Colors.transparent,
-                    borderColor: Colors.transparent,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'When is your free time?',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              const SizedBox(
+                height: WhiteSpaceSize.verySmall,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: UnconstrainedBox(
+                  child: SplashButton(
+                    horizontalPadding: PaddingSize.small,
+                    verticalPadding: PaddingSize.verySmall,
+                    callbackFunction: () async {
+                      List<DateTime>? timeSlot =
+                          await showOmniDateTimeRangePicker(
+                        context: context,
+                        is24HourMode: true,
+                        isForceEndDateAfterStartDate: true,
+                        startInitialDate: DateTime.now().add(const Duration(
+                          minutes: 10,
+                        )),
+                        startFirstDate: DateTime.now(),
+                        startLastDate: DateTime.now().add(const Duration(
+                          days: 30,
+                        )),
+                        endInitialDate: DateTime.now().add(const Duration(
+                          minutes: 20,
+                        )),
+                        endFirstDate: DateTime.now(),
+                        endLastDate: DateTime.now().add(const Duration(
+                          days: 30,
+                        )),
+                        minutesInterval: 5,
+                        borderRadius: const BorderRadius.all(Radius.circular(
+                          CurvatureSize.large,
+                        )),
+                        constraints: const BoxConstraints(
+                          maxWidth: 350,
+                          maxHeight: 650,
+                        ),
+                        transitionBuilder: (context, animA, animB, child) {
+                          return FadeTransition(
+                            opacity: animA.drive(
+                              Tween(
+                                begin: 0.0,
+                                end: 1.0,
+                              ),
+                            ),
+                            child: child,
+                          );
+                        },
+                        transitionDuration: const Duration(
+                          milliseconds: AnimationDuration.medium,
+                        ),
+                        barrierDismissible: true,
+                        selectableDayPredicate: (dateTime) {
+                          if (dateTime == DateTime(2023, 2, 25)) {
+                            return false;
+                          } else {
+                            return true;
+                          }
+                        },
+                      );
+                    },
+                    buttonColor: Theme.of(context).scaffoldBackgroundColor,
+                    borderColor: Theme.of(context).dividerColor,
                     borderRadius: BorderRadius.circular(
-                      CurvatureSize.large,
+                      CurvatureSize.infinity,
                     ),
                     child: Text(
-                      TranslationKey.resetButton.name.tr(),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).focusColor,
-                          ),
+                      'Add a Slot',
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
-                  SplashButton(
-                    horizontalPadding: PaddingSize.veryLarge,
-                    verticalPadding: PaddingSize.small,
-                    callbackFunction: () {},
-                    borderRadius: BorderRadius.circular(
-                      CurvatureSize.large,
+                ),
+              ),
+              const SizedBox(
+                height: WhiteSpaceSize.large,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  bottom: PaddingSize.medium,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SplashButton(
+                      horizontalPadding: PaddingSize.veryLarge,
+                      verticalPadding: PaddingSize.small,
+                      callbackFunction: () => setState(() {
+                        _syncWithDatabase();
+                      }),
+                      buttonColor: Colors.transparent,
+                      borderColor: Colors.transparent,
+                      borderRadius: BorderRadius.circular(
+                        CurvatureSize.large,
+                      ),
+                      child: Text(
+                        TranslationKey.resetButton.name.tr(),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Theme.of(context).focusColor,
+                                ),
+                      ),
                     ),
-                    shadow: Shadow.medium,
-                    child: Text(
-                      TranslationKey.applyButton.name.tr(),
-                      style: Theme.of(context).textTheme.titleMedium,
+                    SplashButton(
+                      horizontalPadding: PaddingSize.veryLarge,
+                      verticalPadding: PaddingSize.small,
+                      callbackFunction: () {},
+                      borderRadius: BorderRadius.circular(
+                        CurvatureSize.large,
+                      ),
+                      shadow: Shadow.medium,
+                      child: Text(
+                        TranslationKey.applyButton.name.tr(),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

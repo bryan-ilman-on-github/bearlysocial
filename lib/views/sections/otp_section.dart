@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
-import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/endpoint.dart';
 import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
@@ -27,11 +26,11 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
   String _otpErrorText = '';
 
   void _goBack() {
-    _otpErrorText = '';
+    ref.read(setAuthenticationPageEmailAddress)(emailAddress: '');
 
     _enabled = true;
 
-    ref.read(setAuthenticationPageEmailAddress)(emailAddress: '');
+    _otpErrorText = '';
   }
 
   @override
@@ -92,20 +91,20 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                     );
 
                     if (httpResponse.statusCode == 200) {
-                      ref.read(setAuthenticationPageEmailAddress)(
-                        emailAddress: '',
-                      );
-
                       DatabaseOperation.insertTransactions(
-                        pairs: {
-                          DatabaseKey.id.name: id,
-                          DatabaseKey.token.name: jsonDecode(
-                            httpResponse.body,
-                          )[DatabaseKey.token.name],
-                        },
+                        pairs: Map<String, String>.from(
+                          jsonDecode(httpResponse.body)
+                            ..removeWhere(
+                              (_, value) => value == null,
+                            ),
+                        ),
                       );
 
                       ref.read(enterApp)();
+
+                      ref.read(setAuthenticationPageEmailAddress)(
+                        emailAddress: '',
+                      );
                     } else {
                       final message = jsonDecode(httpResponse.body)['message'];
                       if (message != null) {
