@@ -8,41 +8,49 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SocialMediaLink extends StatelessWidget {
   final SocialMedia platform;
-  final TextEditingController? controller;
+  final String? handle;
+  final TextEditingController controller;
 
   const SocialMediaLink({
     super.key,
     required this.platform,
-    this.controller,
+    required this.controller,
+    this.handle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final String username = DatabaseOperation.retrieveTransaction(
-      key: '${platform.name}Handle',
+    controller.text = handle ??
+        DatabaseOperation.retrieveTransaction(key: '${platform.name}_handle');
+
+    dynamic peerVerificationCount = DatabaseOperation.retrieveTransaction(
+      key: '${platform.name}_peer_verification_count',
     );
-    controller?.text = username;
+
+    if (peerVerificationCount.isNotEmpty) {
+      peerVerificationCount = int.parse(peerVerificationCount);
+    }
 
     final TextStyle? linkStyle =
         Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).focusColor,
             );
 
-    final Widget linkText = controller == null
-        ? Text(
-            username.isNotEmpty ? username : '-',
-            style: TextStyle(
-              color: Theme.of(context).indicatorColor,
-            ),
-          )
-        : TextField(
+    final Widget linkText = handle == null
+        ? TextField(
             controller: controller,
             style: linkStyle,
             decoration: InputDecoration(
               isCollapsed: true,
               border: InputBorder.none,
-              hintText: 'Type your username here.',
+              hintText: 'Type your handle here.',
               hintStyle: linkStyle,
+            ),
+          )
+        : Text(
+            handle!.isEmpty ? '-' : handle as String,
+            style: TextStyle(
+              color: Theme.of(context).indicatorColor,
             ),
           );
 
@@ -53,9 +61,11 @@ class SocialMediaLink extends StatelessWidget {
       color: Theme.of(context).focusColor,
     );
 
-    final Widget icon = username.isNotEmpty
+    final Widget icon = controller.text.isNotEmpty
         ? SvgPicture.asset(
-            'assets/svgs/warning_icon.svg',
+            peerVerificationCount <= 4
+                ? 'assets/svgs/warning_icon.svg'
+                : 'assets/svgs/circle_check_icon.svg',
             width: SideSize.small,
             height: SideSize.small,
             color: Theme.of(context).focusColor,
@@ -63,16 +73,16 @@ class SocialMediaLink extends StatelessWidget {
         : const SizedBox();
 
     return GestureDetector(
-      onTap: () => controller == null && username.isNotEmpty
+      onTap: () => handle != null
           ? launchUrl(
-              Uri.parse(platform.domain + username),
+              Uri.parse(platform.domain + handle!),
               mode: LaunchMode.externalApplication,
             )
           : null,
-      onLongPress: () => controller == null && username.isNotEmpty
+      onLongPress: () => handle != null
           ? Clipboard.setData(
               ClipboardData(
-                text: platform.domain + username,
+                text: platform.domain + handle!,
               ),
             )
           : null,
@@ -86,7 +96,9 @@ class SocialMediaLink extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  username.isNotEmpty ? '0 peer verification(s)' : '',
+                  controller.text.isNotEmpty
+                      ? '$peerVerificationCount peer verification(s)'
+                      : '',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontStyle: FontStyle.italic,
                       ),

@@ -40,7 +40,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
   double? _yAxisValue;
   double? _xAxisValue;
 
-  Face? _detectedFace;
+  Face? _prevDetectedFace;
   bool _detecting = false;
 
   Timer? _focusTimer;
@@ -121,7 +121,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
         if (!_detecting) {
           _detecting = true;
 
-          final Face? detectedFace = await SelfieCaptureOperation.detectFace(
+          final Face? nowDetectedFace = await SelfieCaptureOperation.detectFace(
             screenSize: screenSize,
             image: img,
             sensorOrientation: widget.frontCamera.sensorOrientation,
@@ -130,9 +130,10 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
 
           // Check if the detected face is the same as the previously detected face
           final bool sameFace =
-              _detectedFace?.trackingId == detectedFace?.trackingId;
+              _prevDetectedFace?.trackingId == nowDetectedFace?.trackingId;
 
-          final double? smilingProbability = detectedFace?.smilingProbability;
+          final double? smilingProbability =
+              nowDetectedFace?.smilingProbability;
 
           // Check if the detected face is smiling with a high probability (98% or more)
           final bool highSmilingProbability =
@@ -176,8 +177,9 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
           }
 
           setState(() {
-            _detectedFace = detectedFace;
+            _prevDetectedFace = nowDetectedFace;
           });
+
           _detecting = false;
         }
       });
@@ -186,9 +188,9 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
 
   @override
   void dispose() {
+    _faceDetector.close();
     _animationController.dispose();
     _camController.dispose();
-    _faceDetector.close();
 
     super.dispose();
   }
@@ -197,8 +199,8 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
   Widget build(BuildContext context) {
     _calculateCameraFrameCancelButtonPosition();
 
-    final textStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.normal,
+    final whiteTextStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontSize: TextSize.large,
           color: Colors.white,
         );
 
@@ -215,15 +217,17 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
               Column(
                 children: [
                   Expanded(
-                    child: _detectedFace == null
+                    child: _prevDetectedFace == null
                         ? AnimatedEllipticalText(
                             controller: _animationController,
-                            textStyle: textStyle,
+                            textStyle: whiteTextStyle,
                             leadingText: 'Scanning facial features',
                           )
-                        : Text(
-                            'Smile to take a photo.',
-                            style: textStyle,
+                        : Center(
+                            child: Text(
+                              'Smile to take a photo.',
+                              style: whiteTextStyle,
+                            ),
                           ),
                   ),
                   Expanded(
@@ -231,7 +235,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
                     child: _CameraFrame(
                       color:
                           _settingFocus ? AppColor.lightYellow : Colors.white,
-                      gapSize: _detectedFace == null
+                      gapSize: _prevDetectedFace == null
                           ? MarginSize.veryLarge
                           : MarginSize.verySmall / 10,
                     ),
@@ -240,7 +244,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
                     child: _settingFocus
                         ? AnimatedEllipticalText(
                             controller: _animationController,
-                            textStyle: textStyle,
+                            textStyle: whiteTextStyle,
                             leadingText: 'Adjusting focus',
                           )
                         : const SizedBox(),

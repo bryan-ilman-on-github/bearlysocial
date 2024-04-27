@@ -33,8 +33,6 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
-
   bool changesNotSaved = false;
 
   img_lib.Image? _canvas;
@@ -127,35 +125,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     });
   }
 
-  void _captureSelfie() {
-    UserPermission.cameraPermission.then((cameraPermission) async {
-      if (!cameraPermission) return;
+  Future<CameraDescription?> _getFrontCam() async {
+    final bool camAllowed = await UserPermission.cameraPermission;
 
-      final frontCamera = (await availableCameras()).firstWhere(
+    if (camAllowed) {
+      return (await availableCameras()).firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.front,
       );
-
-      final BuildContext? ctx = _key.currentContext;
-
-      if (ctx != null && ctx.mounted) {
-        Navigator.of(ctx).push(
-          PageRouteBuilder(
-            pageBuilder: (ctx, p, q) => SelfieScreen(
-              frontCamera: frontCamera,
-              onPictureSuccess: ({required img_lib.Image? profilePic}) {
-                setState(() {
-                  _canvas = profilePic;
-                  changesNotSaved = true;
-                });
-              },
-            ),
-            transitionDuration: const Duration(
-              seconds: AnimationDuration.instant,
-            ),
-          ),
-        );
-      }
-    });
+    } else {
+      return null;
+    }
   }
 
   void _addListenersToControllers(List<TextEditingController> controllers) {
@@ -206,7 +185,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       child: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SingleChildScrollView(
-          key: _key,
           controller: widget.controller,
           padding: const EdgeInsets.symmetric(
             horizontal: PaddingSize.medium,
@@ -236,7 +214,30 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: SplashButton(
                   horizontalPadding: PaddingSize.small,
                   verticalPadding: PaddingSize.verySmall,
-                  callbackFunction: _captureSelfie,
+                  callbackFunction: () {
+                    _getFrontCam().then((frontCamera) {
+                      if (frontCamera != null) {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (_, p, q) => SelfieScreen(
+                              frontCamera: frontCamera,
+                              onPictureSuccess: ({
+                                required img_lib.Image? profilePic,
+                              }) {
+                                setState(() {
+                                  _canvas = profilePic;
+                                  changesNotSaved = true;
+                                });
+                              },
+                            ),
+                            transitionDuration: const Duration(
+                              seconds: AnimationDuration.instant,
+                            ),
+                          ),
+                        );
+                      }
+                    });
+                  },
                   buttonColor: Theme.of(context).scaffoldBackgroundColor,
                   borderColor: Theme.of(context).dividerColor,
                   borderRadius: BorderRadius.circular(
