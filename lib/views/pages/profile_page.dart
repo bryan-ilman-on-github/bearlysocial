@@ -8,6 +8,7 @@ import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/native_lang_name.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
+import 'package:bearlysocial/utilities/api.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/dropdown_operation.dart';
 import 'package:bearlysocial/utilities/form_management.dart';
@@ -144,6 +145,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           changesNotSaved = true;
         });
       });
+    }
+  }
+
+  void _apply() {
+    if (_canvas != null) {
+      print('HELLO AGAIN!');
+      API.imageUpload(
+        img: _canvas as img_lib.Image,
+        uid: DatabaseOperation.retrieveTransaction(
+          key: DatabaseKey.id.name,
+        ),
+      );
     }
   }
 
@@ -427,7 +440,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     SplashButton(
                       horizontalPadding: PaddingSize.veryLarge,
                       verticalPadding: PaddingSize.small,
-                      callbackFunction: () {},
+                      callbackFunction: _apply,
                       borderRadius: BorderRadius.circular(
                         CurvatureSize.large,
                       ),
