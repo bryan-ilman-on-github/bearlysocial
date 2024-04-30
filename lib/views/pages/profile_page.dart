@@ -8,7 +8,7 @@ import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/native_lang_name.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:bearlysocial/utilities/api.dart';
+import 'package:bearlysocial/utilities/apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/dropdown_operation.dart';
 import 'package:bearlysocial/utilities/form_management.dart';
@@ -53,8 +53,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   final FocusNode _firstNameFocusNode = FocusNode();
   final FocusNode _lastNameFocusNode = FocusNode();
 
-  void _syncWithDatabase() {
-    _canvas = null;
+  void _syncWithDatabase() async {
+    _canvas = await API.imageGet(
+      uid: DatabaseOperation.retrieveTransaction(
+        key: DatabaseKey.id.name,
+      ),
+    );
 
     _firstNameController.text = DatabaseOperation.retrieveTransaction(
       key: DatabaseKey.first_name.name,
@@ -87,7 +91,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: DatabaseKey.linkedin_handle.name,
     );
 
-    changesNotSaved = false;
+    setState(() {
+      changesNotSaved = false;
+    });
   }
 
   void _addInterest() {
@@ -174,13 +180,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       _linkedinLinkController,
     ]);
 
-    _syncWithDatabase();
-
     _firstNameFocusNode.addListener(() {
       setState(() {});
     });
     _lastNameFocusNode.addListener(() {
       setState(() {});
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncWithDatabase();
     });
   }
 
@@ -209,8 +217,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: Text(
                   changesNotSaved ? 'changes not saved' : '',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
                         fontSize: TextSize.medium,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.2,
+                        wordSpacing: 0.2,
                       ),
                 ),
               ),
@@ -421,9 +431,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     SplashButton(
                       horizontalPadding: PaddingSize.veryLarge,
                       verticalPadding: PaddingSize.small,
-                      callbackFunction: () => setState(() {
-                        _syncWithDatabase();
-                      }),
+                      callbackFunction: _syncWithDatabase,
                       buttonColor: Colors.transparent,
                       borderColor: Colors.transparent,
                       borderRadius: BorderRadius.circular(

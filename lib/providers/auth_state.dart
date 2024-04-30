@@ -1,6 +1,6 @@
 import 'package:bearlysocial/constants/db_key.dart';
-import 'package:bearlysocial/constants/endpoint.dart';
-import 'package:bearlysocial/utilities/api.dart';
+import 'package:bearlysocial/constants/cloud_services_details.dart';
+import 'package:bearlysocial/utilities/apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';

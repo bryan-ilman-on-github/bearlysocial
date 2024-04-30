@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/constants/endpoint.dart';
+import 'package:bearlysocial/constants/cloud_services_details.dart';
 import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
 import 'package:bearlysocial/providers/auth_state.dart';
-import 'package:bearlysocial/utilities/api.dart';
+import 'package:bearlysocial/utilities/apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
