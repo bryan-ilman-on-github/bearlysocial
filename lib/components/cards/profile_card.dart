@@ -46,7 +46,9 @@ class ProfileCard extends StatelessWidget {
         children: [
           Stack(
             children: <Widget>[
-              const ProfilePicture(),
+              // const ProfilePicture(
+              //   uid: '',
+              // ),
               Positioned(
                 bottom: 0.0,
                 right: 0.0,

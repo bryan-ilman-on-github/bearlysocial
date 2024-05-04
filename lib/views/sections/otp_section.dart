@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
+import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/cloud_services_details.dart';
-import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
-import 'package:bearlysocial/providers/auth_state.dart';
-import 'package:bearlysocial/utilities/apis.dart';
+import 'package:bearlysocial/providers/auth_details/auth_page_email_address_state.dart';
+import 'package:bearlysocial/providers/auth_details/auth_state.dart';
+import 'package:bearlysocial/utilities/cloud_services_apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -78,19 +79,31 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                       _enabled = false;
                     });
 
-                    String id = DatabaseOperation.getSHA256(
+                    String uid = DatabaseOperation.getSHA256(
                       input: ref.read(authenticationPageEmailAddress),
                     ).substring(0, 16);
 
-                    final Response httpResponse = await API.makeRequest(
-                      endpoint: Endpoint.validateOTP,
+                    final Response httpResponse =
+                        await AmazonWebServicesLambdaAPI.postRequest(
+                      endpoint: AmazonWebServicesLambdaEndpoints.validateOTP,
                       body: {
-                        'id': id,
+                        'id': uid,
                         'otp': _otp.join(),
                       },
                     );
 
                     if (httpResponse.statusCode == 200) {
+                      DigitalOceanSpacesAPI.downloadProfilePic(
+                        uid: uid,
+                      ).then((base64ProfilePic) {
+                        if (base64ProfilePic != null) {
+                          DatabaseOperation.insertTransaction(
+                            key: DatabaseKey.base_64_profile_pic.name,
+                            value: base64ProfilePic,
+                          );
+                        }
+                      });
+
                       DatabaseOperation.insertTransactions(
                         pairs: Map<String, String>.from(
                           jsonDecode(httpResponse.body)

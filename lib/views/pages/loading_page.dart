@@ -1,4 +1,4 @@
-import 'package:bearlysocial/constants/design_tokens.dart';
+import 'package:bearlysocial/components/lines/progress_spinner.dart';
 import 'package:flutter/material.dart';
 
 class LoadingPage extends StatelessWidget {
@@ -8,16 +8,9 @@ class LoadingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
+      body: const SafeArea(
         child: Center(
-          child: SizedBox(
-            width: SideSize.small,
-            height: SideSize.small,
-            child: CircularProgressIndicator(
-              strokeWidth: ThicknessSize.veryLarge,
-              color: Theme.of(context).focusColor,
-            ),
-          ),
+          child: ProgressSpinner(),
         ),
       ),
     );

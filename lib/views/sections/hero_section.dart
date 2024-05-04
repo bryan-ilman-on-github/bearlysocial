@@ -2,17 +2,17 @@ import 'dart:convert';
 
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
+import 'package:bearlysocial/components/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/cloud_services_details.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:bearlysocial/providers/auth_page_email_address_state.dart';
-import 'package:bearlysocial/utilities/apis.dart';
+import 'package:bearlysocial/providers/auth_details/auth_page_email_address_state.dart';
+import 'package:bearlysocial/utilities/cloud_services_apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/form_management.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart';
 
 class HeroSection extends ConsumerStatefulWidget {
   const HeroSection({super.key});
@@ -63,20 +63,20 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
         input: emailAddress,
       ).substring(0, 16);
 
-      final Response httpResponse = await API.makeRequest(
-        endpoint: Endpoint.sendOTPviaEmail,
+      final response = await AmazonWebServicesLambdaAPI.postRequest(
+        endpoint: AmazonWebServicesLambdaEndpoints.sendOTPviaEmail,
         body: {
           'id': id,
           'email_address': emailAddress,
         },
       );
 
-      if (httpResponse.statusCode == 200) {
+      if (response.statusCode == 200) {
         _blockInput = false;
 
         ref.read(setAuthenticationPageEmailAddress)(emailAddress: emailAddress);
       } else {
-        dynamic cooldownTime = jsonDecode(httpResponse.body)['cooldown_time'];
+        dynamic cooldownTime = jsonDecode(response.body)['cooldown_time'];
         dynamic remainingMinutes;
 
         if (cooldownTime != null) {
@@ -149,14 +149,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
               : null,
           shadow: Shadow.medium,
           child: _blockInput
-              ? SizedBox(
-                  width: SideSize.verySmall,
-                  height: SideSize.verySmall,
-                  child: CircularProgressIndicator(
-                    strokeWidth: ThicknessSize.large,
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                  ),
-                )
+              ? const ProgressSpinner()
               : Text(
                   'Continue',
                   style: Theme.of(context).textTheme.titleMedium,

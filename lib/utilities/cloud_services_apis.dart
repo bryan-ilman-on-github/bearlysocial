@@ -40,12 +40,14 @@ class DigitalOceanSpacesAPI {
     credentialsProvider: AWSCredentialsProvider(_awsCredentials),
   );
 
-  /// Sends an image to DigitalOcean Spaces.
-  static Future<int> sendImage({
-    required img_lib.Image image,
+  /// This method uploads a profile picture to DigitalOcean Spaces.
+  static Future<int> uploadProfilePic({
+    required img_lib.Image profilePic,
     required String uid,
   }) async {
-    final Uint8List imageBytes = Uint8List.fromList(img_lib.encodeJpg(image));
+    final Uint8List imageBytes = Uint8List.fromList(
+      img_lib.encodeJpg(profilePic),
+    );
     const String mimeType = 'image/jpeg';
     final String filename = '$uid.jpg';
 
@@ -78,8 +80,8 @@ class DigitalOceanSpacesAPI {
     return reponse.statusCode;
   }
 
-  /// Gets an image from DigitalOcean Spaces.
-  static Future<img_lib.Image?> getImage({
+  /// This method downloads a profile picture from DigitalOcean Spaces.
+  static Future<String?> downloadProfilePic({
     required String uid,
   }) async {
     final String filename = '$uid.jpg';
@@ -103,7 +105,7 @@ class DigitalOceanSpacesAPI {
     final response = await signedGetRequest.send().response;
 
     if (response.statusCode == 200) {
-      return img_lib.decodeImage(Uint8List.fromList(await response.bodyBytes));
+      return base64Encode(Uint8List.fromList(await response.bodyBytes));
     } else {
       return null;
     }

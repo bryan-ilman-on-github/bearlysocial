@@ -1,6 +1,6 @@
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/cloud_services_details.dart';
-import 'package:bearlysocial/utilities/apis.dart';
+import 'package:bearlysocial/utilities/cloud_services_apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
@@ -27,12 +27,12 @@ class AuthenticationStateNotifier extends StateNotifier<bool> {
       ],
     );
 
-    final Response httpResponse = await API.makeRequest(
-      endpoint: Endpoint.validateToken,
+    final response = await AmazonWebServicesLambdaAPI.postRequest(
+      endpoint: AmazonWebServicesLambdaEndpoints.validateToken,
       body: {'id': txnId, 'token': txnToken},
     );
 
-    if (httpResponse.statusCode == 200) {
+    if (response.statusCode == 200) {
       enterApp();
     } else {
       exitApp();
@@ -49,12 +49,12 @@ class AuthenticationStateNotifier extends StateNotifier<bool> {
       ],
     );
 
-    final Response httpResponse = await API.makeRequest(
-      endpoint: Endpoint.deleteAccount,
+    final response = await AmazonWebServicesLambdaAPI.postRequest(
+      endpoint: AmazonWebServicesLambdaEndpoints.deleteAccount,
       body: {'id': txnId, 'token': txnToken},
     );
 
-    if (httpResponse.statusCode == 200) {
+    if (response.statusCode == 200) {
       exitApp();
     }
   }

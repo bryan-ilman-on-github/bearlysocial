@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
@@ -206,6 +207,22 @@ class SelfieCaptureOperation {
       return flippedImage;
     } else {
       return image;
+    }
+  }
+
+  static Widget buildProfilePictureCanvas({
+    required img_lib.Image? profilePic,
+  }) {
+    if (profilePic == null) {
+      return const Icon(
+        Icons.no_photography_outlined,
+      );
+    } else {
+      return ClipOval(
+        child: Image.memory(Uint8List.fromList(
+          img_lib.encodePng(profilePic),
+        )),
+      );
     }
   }
 }

@@ -16,33 +16,33 @@ class ExplorePage extends StatefulWidget {
 
 class _ExplorePageState extends State<ExplorePage> {
   final List<Widget> _children = [
-    ProfileCard(
-      name: 'Larry Page',
-      rating: 4.2,
-      location: 'Jakarta, Indonesia',
-      interests: ['Football'],
-    ),
-    const SizedBox(
-      height: 20,
-    ),
-    ProfileCard(
-      name: 'Larry Page',
-      rating: 4.2,
-      location: 'Jakarta, Indonesia',
-      interests: ['Football'],
-    ),
-    const SizedBox(
-      height: 20,
-    ),
-    ProfileCard(
-      name: 'Larry Page',
-      rating: 4.2,
-      location: 'Jakarta, Indonesia',
-      interests: ['Football'],
-    ),
-    const SizedBox(
-      height: 20,
-    ),
+    // ProfileCard(
+    //   name: 'Larry Page',
+    //   rating: 4.2,
+    //   location: 'Jakarta, Indonesia',
+    //   interests: ['Football'],
+    // ),
+    // const SizedBox(
+    //   height: 20,
+    // ),
+    // ProfileCard(
+    //   name: 'Larry Page',
+    //   rating: 4.2,
+    //   location: 'Jakarta, Indonesia',
+    //   interests: ['Football'],
+    // ),
+    // const SizedBox(
+    //   height: 20,
+    // ),
+    // ProfileCard(
+    //   name: 'Larry Page',
+    //   rating: 4.2,
+    //   location: 'Jakarta, Indonesia',
+    //   interests: ['Football'],
+    // ),
+    // const SizedBox(
+    //   height: 20,
+    // ),
   ];
 
   @override

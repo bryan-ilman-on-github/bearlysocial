@@ -1,4 +1,4 @@
-import 'package:bearlysocial/providers/auth_state.dart';
+import 'package:bearlysocial/providers/auth_details/auth_state.dart';
 import 'package:bearlysocial/themes.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/inline_translation_loader.dart';
