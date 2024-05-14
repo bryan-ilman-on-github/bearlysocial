@@ -47,6 +47,7 @@ class _ExplorePageState extends State<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('REBUILD AGAIN!');
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.symmetric(

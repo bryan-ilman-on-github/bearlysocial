@@ -149,7 +149,9 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
               : null,
           shadow: Shadow.medium,
           child: _blockInput
-              ? const ProgressSpinner()
+              ? const ProgressSpinner(
+                  invertColor: true,
+                )
               : Text(
                   'Continue',
                   style: Theme.of(context).textTheme.titleMedium,

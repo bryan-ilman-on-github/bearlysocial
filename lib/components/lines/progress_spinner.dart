@@ -2,7 +2,12 @@ import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class ProgressSpinner extends StatelessWidget {
-  const ProgressSpinner({super.key});
+  final bool invertColor;
+
+  const ProgressSpinner({
+    super.key,
+    this.invertColor = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +16,9 @@ class ProgressSpinner extends StatelessWidget {
       height: SideSize.verySmall,
       child: CircularProgressIndicator(
         strokeWidth: ThicknessSize.large,
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: invertColor
+            ? Theme.of(context).scaffoldBackgroundColor
+            : Theme.of(context).dividerColor,
       ),
     );
   }

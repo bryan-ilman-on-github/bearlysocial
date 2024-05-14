@@ -12,44 +12,55 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await DatabaseOperation.createConnection();
   await EasyLocalization.ensureInitialized();
 
-  runApp(
-    ProviderScope(
+  runApp(const AppProvider());
+}
+
+class AppProvider extends StatelessWidget {
+  const AppProvider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
       child: EasyLocalization(
-        supportedLocales: const [
-          Locale('en'),
-        ],
+        supportedLocales: const [Locale('en')],
         path: 'assets/l10n',
         fallbackLocale: const Locale('en'),
         assetLoader: InlineTranslationLoader(),
         child: const App(),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class App extends ConsumerStatefulWidget {
-  const App({super.key});
+  const App({Key? key}) : super(key: key);
 
   @override
   ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends ConsumerState<App> {
+class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    ref.read(validateToken)().then((_) => setState(() => _loading = false));
+  }
 
-    ref.read(validateToken)().then((_) {
-      setState(() {
-        _loading = false;
-      });
-    });
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() {});
   }
 
   @override
@@ -58,7 +69,7 @@ class _AppState extends ConsumerState<App> {
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness:
-            MediaQuery.of(context).platformBrightness == Brightness.dark
+            WidgetsBinding.instance.window.platformBrightness == Brightness.dark
                 ? Brightness.light
                 : Brightness.dark,
       ),
