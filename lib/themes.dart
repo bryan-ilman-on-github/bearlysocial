@@ -16,6 +16,11 @@ ThemeData createTheme({required bool lightMode}) {
   _indicatorColor = lightMode ? AppColor.heavyBlue : AppColor.lightBlue;
 
   return ThemeData(
+    colorScheme: const ColorScheme.light(
+      primary: AppColor.heavyGray,
+      surface: Colors.transparent,
+      onSurface: AppColor.heavyGray,
+    ),
     primaryColor: AppColor.primary,
     scaffoldBackgroundColor: _backgroundColor,
     dividerColor: _normalColor,

@@ -388,16 +388,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         startInitialDate: DateTime.now().add(const Duration(
                           minutes: 10,
                         )),
-                        startFirstDate: DateTime.now(),
+                        startFirstDate: DateTime.now().add(const Duration(
+                          minutes: 5,
+                        )),
                         startLastDate: DateTime.now().add(const Duration(
                           days: 30,
                         )),
                         endInitialDate: DateTime.now().add(const Duration(
                           minutes: 20,
                         )),
-                        endFirstDate: DateTime.now(),
+                        endFirstDate: DateTime.now().add(const Duration(
+                          minutes: 5,
+                        )),
                         endLastDate: DateTime.now().add(const Duration(
                           days: 30,
+                          minutes: 10,
                         )),
                         minutesInterval: 5,
                         borderRadius: const BorderRadius.all(Radius.circular(
@@ -422,13 +427,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           milliseconds: AnimationDuration.medium,
                         ),
                         barrierDismissible: true,
-                        selectableDayPredicate: (dateTime) {
-                          if (dateTime == DateTime(2023, 2, 25)) {
-                            return false;
-                          } else {
-                            return true;
-                          }
-                        },
                       );
                     },
                     buttonColor: Theme.of(context).scaffoldBackgroundColor,
@@ -437,7 +435,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       CurvatureSize.infinity,
                     ),
                     child: Text(
-                      'Add a Slot',
+                      'Add a Time Slot',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
