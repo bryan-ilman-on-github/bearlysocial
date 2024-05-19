@@ -16,11 +16,6 @@ ThemeData createTheme({required bool lightMode}) {
   _indicatorColor = lightMode ? AppColor.heavyBlue : AppColor.lightBlue;
 
   return ThemeData(
-    colorScheme: const ColorScheme.light(
-      primary: AppColor.heavyGray,
-      surface: Colors.transparent,
-      onSurface: AppColor.heavyGray,
-    ),
     primaryColor: AppColor.primary,
     scaffoldBackgroundColor: _backgroundColor,
     dividerColor: _normalColor,
@@ -28,6 +23,11 @@ ThemeData createTheme({required bool lightMode}) {
     highlightColor: _highlightColor,
     indicatorColor: _indicatorColor,
     textTheme: _textTheme,
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: _focusColor,
+      selectionColor: _highlightColor,
+      selectionHandleColor: _focusColor,
+    ),
     iconTheme: _iconTheme,
     dropdownMenuTheme: _dropdownMenuTheme,
     splashFactory: InkRipple.splashFactory,
@@ -93,6 +93,7 @@ DropdownMenuThemeData get _dropdownMenuTheme {
           CurvatureSize.large,
         ),
         borderSide: BorderSide(
+          width: ThicknessSize.medium,
           color: _normalColor as Color,
         ),
       ),
@@ -118,8 +119,11 @@ DropdownMenuThemeData get _dropdownMenuTheme {
           ),
         ),
       ),
-      backgroundColor: MaterialStatePropertyAll(
-        _focusColor,
+      backgroundColor: const MaterialStatePropertyAll(
+        Colors.white,
+      ),
+      surfaceTintColor: const MaterialStatePropertyAll(
+        Colors.transparent,
       ),
       maximumSize: const MaterialStatePropertyAll(
         Size(

@@ -12,7 +12,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await DatabaseOperation.createConnection();
+
   await EasyLocalization.ensureInitialized();
 
   runApp(const AppProvider());
@@ -28,7 +30,7 @@ class AppProvider extends StatelessWidget {
         supportedLocales: const [Locale('en')],
         path: 'assets/l10n',
         fallbackLocale: const Locale('en'),
-        assetLoader: InlineTranslationLoader(),
+        assetLoader: TranslationLoader(),
         child: const App(),
       ),
     );
@@ -48,7 +50,9 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addObserver(this);
+
     ref.read(validateToken)().then((_) => setState(() => _loading = false));
   }
 
@@ -65,15 +69,13 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-            WidgetsBinding.instance.window.platformBrightness == Brightness.dark
-                ? Brightness.light
-                : Brightness.dark,
-      ),
-    );
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness:
+          WidgetsBinding.instance.window.platformBrightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+    ));
 
     return MaterialApp(
       title: 'BearlySocial',

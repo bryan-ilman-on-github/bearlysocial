@@ -53,25 +53,25 @@ class _UnderlinedTextFieldState extends State<UnderlinedTextField> {
         errorBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
             color: AppColor.heavyRed,
-            width: ThicknessSize.small,
+            width: ThicknessSize.medium,
           ),
         ),
         focusedErrorBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
             color: AppColor.heavyRed,
-            width: ThicknessSize.medium,
+            width: ThicknessSize.large,
           ),
         ),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(
             color: Theme.of(context).dividerColor,
-            width: ThicknessSize.small,
+            width: ThicknessSize.medium,
           ),
         ),
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(
             color: Theme.of(context).focusColor,
-            width: ThicknessSize.medium,
+            width: ThicknessSize.large,
           ),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,

@@ -8,6 +8,7 @@ class SplashButton extends StatelessWidget {
   final double? verticalPadding;
   final Function()? callbackFunction;
   final Color? buttonColor;
+  final double? borderThickness;
   final Color? borderColor;
   final BorderRadius? borderRadius;
   final Color? splashColor;
@@ -25,6 +26,7 @@ class SplashButton extends StatelessWidget {
     this.verticalPadding,
     this.callbackFunction,
     this.buttonColor,
+    this.borderThickness,
     this.borderColor,
     this.borderRadius,
     this.splashColor,
@@ -53,6 +55,7 @@ class SplashButton extends StatelessWidget {
         color: buttonColor ?? Theme.of(context).focusColor,
         shape: RoundedRectangleBorder(
           side: BorderSide(
+            width: borderThickness ?? ThicknessSize.medium,
             color: borderColor ?? Colors.transparent,
           ),
           borderRadius: borderRadius ??

@@ -113,7 +113,7 @@ class SocialMediaLink extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).highlightColor,
               border: Border.all(
-                color: Colors.transparent,
+                color: Theme.of(context).focusColor,
                 width: ThicknessSize.medium,
               ),
               borderRadius: BorderRadius.circular(

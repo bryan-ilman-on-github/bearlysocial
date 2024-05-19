@@ -9,10 +9,12 @@ import 'package:image/image.dart' as img_lib;
 
 class ProfilePicture extends StatefulWidget {
   final String uid;
+  final bool collapsed;
 
   const ProfilePicture({
     super.key,
     required this.uid,
+    this.collapsed = false,
   });
 
   @override
@@ -49,12 +51,13 @@ class _ProfilePictureState extends State<ProfilePicture> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: SideSize.large,
-      height: SideSize.large,
+      width: widget.collapsed ? SideSize.medium : SideSize.large,
+      height: widget.collapsed ? SideSize.medium : SideSize.large,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: _enableBorder
             ? Border.all(
+                width: ThicknessSize.medium,
                 color: Theme.of(context).dividerColor,
               )
             : null,

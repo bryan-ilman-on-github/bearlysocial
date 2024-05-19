@@ -26,6 +26,7 @@ import 'package:bearlysocial/views/form_fields/interest_collection.dart';
 import 'package:bearlysocial/views/form_fields/lang_collection.dart';
 import 'package:bearlysocial/views/form_fields/last_name.dart';
 import 'package:bearlysocial/views/form_fields/profile_pic.dart' as form_fields;
+import 'package:bearlysocial/views/form_fields/time_slots.dart';
 import 'package:bearlysocial/views/screens/selfie_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -61,6 +62,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   final FocusNode _firstNameFocusNode = FocusNode();
   final FocusNode _lastNameFocusNode = FocusNode();
+
+  final List<List<DateTime>> timeSlots = [];
 
   void _syncWithDatabase() {
     ref.read(setProfilePicLoadingState)(
@@ -298,14 +301,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       }
                     });
                   },
-                  buttonColor: Theme.of(context).scaffoldBackgroundColor,
-                  borderColor: Theme.of(context).dividerColor,
+                  buttonColor: Theme.of(context).highlightColor,
+                  borderColor: Theme.of(context).focusColor,
                   borderRadius: BorderRadius.circular(
                     CurvatureSize.infinity,
                   ),
                   child: Text(
                     'Update Profile Picture',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).focusColor,
+                        ),
                   ),
                 ),
               ),
@@ -373,6 +378,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.verySmall,
               ),
+              const TimeSlots(),
+              const SizedBox(
+                height: WhiteSpaceSize.verySmall,
+              ),
+              const TimeSlots(),
+              const SizedBox(
+                height: WhiteSpaceSize.verySmall,
+              ),
               Align(
                 alignment: Alignment.centerLeft,
                 child: UnconstrainedBox(
@@ -383,27 +396,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       List<DateTime>? timeSlot =
                           await showOmniDateTimeRangePicker(
                         context: context,
+                        theme: ThemeData(
+                          colorScheme: const ColorScheme.light(
+                            primary: AppColor.heavyGray,
+                            surface: Colors.transparent,
+                            onSurface: AppColor.heavyGray,
+                          ),
+                        ),
                         is24HourMode: true,
                         isForceEndDateAfterStartDate: true,
-                        startInitialDate: DateTime.now().add(const Duration(
-                          minutes: 10,
-                        )),
-                        startFirstDate: DateTime.now().add(const Duration(
-                          minutes: 5,
-                        )),
-                        startLastDate: DateTime.now().add(const Duration(
-                          days: 30,
-                        )),
-                        endInitialDate: DateTime.now().add(const Duration(
-                          minutes: 20,
-                        )),
-                        endFirstDate: DateTime.now().add(const Duration(
-                          minutes: 5,
-                        )),
-                        endLastDate: DateTime.now().add(const Duration(
-                          days: 30,
-                          minutes: 10,
-                        )),
+                        startInitialDate:
+                            DateTime.now().add(const Duration(minutes: 10)),
+                        endInitialDate:
+                            DateTime.now().add(const Duration(minutes: 20)),
+                        startFirstDate: DateTime.now(),
+                        endFirstDate: DateTime.now(),
+                        startLastDate:
+                            DateTime.now().add(const Duration(days: 30)),
+                        endLastDate:
+                            DateTime.now().add(const Duration(days: 30)),
                         minutesInterval: 5,
                         borderRadius: const BorderRadius.all(Radius.circular(
                           CurvatureSize.large,
@@ -429,14 +440,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         barrierDismissible: true,
                       );
                     },
-                    buttonColor: Theme.of(context).scaffoldBackgroundColor,
-                    borderColor: Theme.of(context).dividerColor,
+                    buttonColor: Theme.of(context).highlightColor,
+                    borderColor: Theme.of(context).focusColor,
                     borderRadius: BorderRadius.circular(
                       CurvatureSize.infinity,
                     ),
                     child: Text(
                       'Add a Time Slot',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).focusColor,
+                          ),
                     ),
                   ),
                 ),

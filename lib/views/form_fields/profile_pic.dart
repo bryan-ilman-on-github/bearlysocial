@@ -18,6 +18,7 @@ class ProfilePicture extends ConsumerWidget {
         shape: BoxShape.circle,
         border: ref.read(profilePicLoadingState) || ref.read(profilePic) == null
             ? Border.all(
+                width: ThicknessSize.medium,
                 color: Theme.of(context).dividerColor,
               )
             : null,

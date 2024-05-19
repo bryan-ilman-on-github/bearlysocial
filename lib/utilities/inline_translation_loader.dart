@@ -3,7 +3,7 @@ import 'package:bearlysocial/constants/translations/fragments/en_frag_mapping.da
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-class InlineTranslationLoader extends AssetLoader {
+class TranslationLoader extends AssetLoader {
   final Map<String, Map<String, String>> _translations = _localizationMappings;
 
   @override
