@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
@@ -64,6 +65,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   final FocusNode _lastNameFocusNode = FocusNode();
 
   final List<List<DateTime>> timeSlots = [];
+
+  // SplayTreeMap<String, int> timeSlots = SplayTreeMap<String, int>();
+  // ages.addAll({
+  //   'John': 30,
+  //   'Alice': 25,
+  //   'Bob': 35,
+  // });
 
   void _syncWithDatabase() {
     ref.read(setProfilePicLoadingState)(
@@ -439,6 +447,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                         barrierDismissible: true,
                       );
+
+                      print(timeSlot);
                     },
                     buttonColor: Theme.of(context).highlightColor,
                     borderColor: Theme.of(context).focusColor,

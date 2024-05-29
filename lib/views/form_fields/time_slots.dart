@@ -40,12 +40,33 @@ class _TimeSlotsState extends State<TimeSlots> {
           Row(
             children: [
               const SizedBox(
-                width: PaddingSize.verySmall,
+                width: PaddingSize.verySmall / 2.0,
               ),
               Expanded(
-                child: Text(
-                  'May 24, 12:10 → May 24, 14:00',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                child: SplashButton(
+                  verticalPadding: PaddingSize.verySmall,
+                  callbackFunction: _toggleExpansion,
+                  buttonColor: Colors.transparent,
+                  child: Row(
+                    children: [
+                      const SizedBox(
+                        width: MarginSize.small,
+                      ),
+                      Text(
+                        'May 24, 12:10 → May 24, 14:00',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(
+                          top: PaddingSize.verySmall,
+                        ),
+                        child: Icon(
+                          Icons.edit_note_rounded,
+                          size: IconSize.small * 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               _TimeSlotButton(
@@ -65,7 +86,10 @@ class _TimeSlotsState extends State<TimeSlots> {
           ),
           if (expanded) ...[
             const Padding(
-              padding: EdgeInsets.only(left: PaddingSize.verySmall),
+              padding: EdgeInsets.only(
+                left: PaddingSize.verySmall * 1.5,
+                top: PaddingSize.verySmall,
+              ),
               child: Text('4 meetup(s)'),
             ),
             const SizedBox(

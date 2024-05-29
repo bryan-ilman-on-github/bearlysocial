@@ -3,7 +3,6 @@ import 'package:bearlysocial/constants/cloud_services_details.dart';
 import 'package:bearlysocial/utilities/cloud_services_apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart';
 
 class AuthenticationStateNotifier extends StateNotifier<bool> {
   AuthenticationStateNotifier() : super(false);
