@@ -64,8 +64,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   final FocusNode _firstNameFocusNode = FocusNode();
   final FocusNode _lastNameFocusNode = FocusNode();
 
-  final List<List<DateTime>> timeSlots = [];
-
   void _syncWithDatabase() {
     ref.read(setProfilePicLoadingState)(
       isProfilePicBeingLoaded: true,
@@ -449,7 +447,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         barrierDismissible: true,
                       );
 
-                      print(timeSlot);
+                      ref.read(addTimeSlot)(
+                        slot: timeSlot,
+                      );
+                      print(ref.read(timeSlots));
                     },
                     buttonColor: Theme.of(context).highlightColor,
                     borderColor: Theme.of(context).focusColor,
