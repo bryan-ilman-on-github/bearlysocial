@@ -17,10 +17,10 @@ import 'package:bearlysocial/providers/form_fields/last_name_focus_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_pic_loading_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_pic_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_save_state.dart';
+import 'package:bearlysocial/providers/form_fields/time_slots_state.dart';
 import 'package:bearlysocial/utilities/cloud_services_apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/dropdown_operation.dart';
-import 'package:bearlysocial/utilities/form_management.dart';
 import 'package:bearlysocial/utilities/user_permission.dart';
 import 'package:bearlysocial/views/form_fields/first_name.dart';
 import 'package:bearlysocial/views/form_fields/interest_collection.dart';
@@ -66,13 +66,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   final List<List<DateTime>> timeSlots = [];
 
-  // SplayTreeMap<String, int> timeSlots = SplayTreeMap<String, int>();
-  // ages.addAll({
-  //   'John': 30,
-  //   'Alice': 25,
-  //   'Bob': 35,
-  // });
-
   void _syncWithDatabase() {
     ref.read(setProfilePicLoadingState)(
       isProfilePicBeingLoaded: true,
@@ -96,18 +89,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
 
     ref.read(setInterestCollection)(
-      collection: FormManagement.stringToList(
-        jsonListString: DatabaseOperation.retrieveTransaction(
-          key: DatabaseKey.interest.name,
+      collection: jsonDecode(
+        DatabaseOperation.retrieveTransaction(
+          key: DatabaseKey.interest_coll_code.name,
         ),
-      ),
+      ).cast<String>(),
     );
     ref.read(setLangCollection)(
-      collection: FormManagement.stringToList(
-        jsonListString: DatabaseOperation.retrieveTransaction(
-          key: DatabaseKey.lang.name,
+      collection: jsonDecode(
+        DatabaseOperation.retrieveTransaction(
+          key: DatabaseKey.lang_coll_code.name,
         ),
-      ),
+      ).cast<String>(),
     );
 
     _interestController.text = '';
@@ -121,6 +114,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
     _linkedinLinkController.text = DatabaseOperation.retrieveTransaction(
       key: DatabaseKey.linkedin_handle.name,
+    );
+
+    ref.read(setTimeSlots)(
+      slots: SplayTreeMap.from(jsonDecode(
+        DatabaseOperation.retrieveTransaction(key: DatabaseKey.time_slots.name),
+      )),
     );
 
     ref.read(setProfilePicLoadingState)(
@@ -141,6 +140,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ref.read(addLabelToInterestCollection)(
         label: _interestController.text,
       );
+      _interestController.text = '';
 
       ref.read(setProfileSaveState)(
         isProfileSaved: false,
@@ -157,6 +157,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ref.read(addLabelToLangCollection)(
         label: _langController.text,
       );
+      _langController.text = '';
 
       ref.read(setProfileSaveState)(
         isProfileSaved: false,

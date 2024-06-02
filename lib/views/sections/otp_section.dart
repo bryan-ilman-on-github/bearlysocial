@@ -106,13 +106,16 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
 
                       DatabaseOperation.insertTransactions(
                         pairs: Map<String, String>.from(
-                          jsonDecode(httpResponse.body)
-                            ..removeWhere(
-                              (_, value) => value == null,
+                          jsonDecode(httpResponse.body).map(
+                            (key, value) => MapEntry<String, String>(
+                              key,
+                              value?.toString() ?? '',
+                            ),
+                          )..removeWhere(
+                              (_, value) => value == null || value.isEmpty,
                             ),
                         ),
                       );
-
                       ref.read(enterApp)();
 
                       ref.read(setAuthenticationPageEmailAddress)(

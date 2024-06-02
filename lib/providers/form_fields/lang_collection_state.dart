@@ -6,19 +6,19 @@ class LanguageCollectionStateNotifier extends StateNotifier<List<String>> {
   void setCollection({
     required List<String> collection,
   }) {
-    state = collection;
+    state = List<String>.from(collection);
   }
 
   void removeFirstLabel() {
-    state.removeAt(0);
+    state = List<String>.from(state)..removeAt(0);
   }
 
   void addLabel({required String label}) {
-    state.add(label);
+    if (!state.contains(label)) state = List<String>.from(state)..add(label);
   }
 
   void removeLabel({required String labelToRemove}) {
-    state.remove(labelToRemove);
+    state = List<String>.from(state)..remove(labelToRemove);
   }
 }
 
