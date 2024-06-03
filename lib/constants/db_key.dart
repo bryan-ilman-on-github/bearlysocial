@@ -10,5 +10,5 @@ enum DatabaseKey {
   fb_handle,
   linkedin_handle,
   mood,
-  time_slots,
+  schedule,
 }

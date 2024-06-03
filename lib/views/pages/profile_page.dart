@@ -17,17 +17,17 @@ import 'package:bearlysocial/providers/form_fields/last_name_focus_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_pic_loading_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_pic_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_save_state.dart';
-import 'package:bearlysocial/providers/form_fields/time_slots_state.dart';
+import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
 import 'package:bearlysocial/utilities/cloud_services_apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/dropdown_operation.dart';
 import 'package:bearlysocial/utilities/user_permission.dart';
 import 'package:bearlysocial/views/form_fields/first_name.dart';
-import 'package:bearlysocial/views/form_fields/interest_collection.dart';
-import 'package:bearlysocial/views/form_fields/lang_collection.dart';
+import 'package:bearlysocial/views/form_fields/interest_coll.dart';
+import 'package:bearlysocial/views/form_fields/lang_coll.dart';
 import 'package:bearlysocial/views/form_fields/last_name.dart';
 import 'package:bearlysocial/views/form_fields/profile_pic.dart' as form_fields;
-import 'package:bearlysocial/views/form_fields/time_slots.dart';
+import 'package:bearlysocial/views/form_fields/schedule.dart';
 import 'package:bearlysocial/views/screens/selfie_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -114,9 +114,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: DatabaseKey.linkedin_handle.name,
     );
 
-    ref.read(setTimeSlots)(
-      slots: SplayTreeMap.from(jsonDecode(
-        DatabaseOperation.retrieveTransaction(key: DatabaseKey.time_slots.name),
+    ref.read(updateSchedule)(
+      timeSlots: SplayTreeMap.from(jsonDecode(
+        DatabaseOperation.retrieveTransaction(key: DatabaseKey.schedule.name),
       )),
     );
 
@@ -385,14 +385,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.verySmall,
               ),
-              const TimeSlots(),
-              const SizedBox(
-                height: WhiteSpaceSize.verySmall,
-              ),
-              const TimeSlots(),
-              const SizedBox(
-                height: WhiteSpaceSize.verySmall,
-              ),
+              const Schedule(),
               Align(
                 alignment: Alignment.centerLeft,
                 child: UnconstrainedBox(
@@ -400,7 +393,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     horizontalPadding: PaddingSize.small,
                     verticalPadding: PaddingSize.verySmall,
                     callbackFunction: () async {
-                      List<DateTime>? timeSlot =
+                      List<DateTime>? timeSlotColl =
                           await showOmniDateTimeRangePicker(
                         context: context,
                         theme: ThemeData(
@@ -447,10 +440,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         barrierDismissible: true,
                       );
 
-                      ref.read(addTimeSlot)(
-                        slot: timeSlot,
+                      ref.read(addTimeSlotCollection)(
+                        collection: timeSlotColl,
                       );
-                      print(ref.read(timeSlots));
                     },
                     buttonColor: Theme.of(context).highlightColor,
                     borderColor: Theme.of(context).focusColor,

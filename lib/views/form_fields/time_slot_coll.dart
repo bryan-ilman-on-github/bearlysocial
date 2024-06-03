@@ -1,22 +1,83 @@
+import 'dart:collection';
+
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/pictures/profile_pic.dart' as reusables;
 import 'package:bearlysocial/constants/design_tokens.dart';
+import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart';
 
-class TimeSlots extends StatefulWidget {
-  const TimeSlots({super.key});
+class TimeSlotCollection extends ConsumerStatefulWidget {
+  final String dateTimeRange;
+  final SplayTreeMap meetups;
+
+  const TimeSlotCollection({
+    super.key,
+    required this.dateTimeRange,
+    required this.meetups,
+  });
 
   @override
-  State<TimeSlots> createState() => _TimeSlotsState();
+  ConsumerState<TimeSlotCollection> createState() => _TimeSlotCollectionState();
 }
 
-class _TimeSlotsState extends State<TimeSlots> {
+class _TimeSlotCollectionState extends ConsumerState<TimeSlotCollection> {
   bool expanded = false;
 
   void _toggleExpansion() {
     setState(() {
       expanded = !expanded;
     });
+  }
+
+  String _formatDateTimeRange(String dateTimeRange) {
+    final dates = dateTimeRange.split('#');
+    final formatIn = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
+    final formatOut = DateFormat('MMM dd, HH:mm');
+
+    final start = formatIn.parse(dates[0]);
+    final end = formatIn.parse(dates[1]);
+
+    return '${formatOut.format(start)} → ${formatOut.format(end)}';
+  }
+
+  List<Widget> meetupsInfoDisplay(SplayTreeMap map) {
+    List<Widget> meetupsWidgets = [];
+
+    map.forEach((key, value) {
+      final userDetails = value.split('#');
+
+      meetupsWidgets.add(
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: PaddingSize.verySmall,
+              ),
+              child: reusables.ProfilePicture(
+                uid: userDetails[1],
+                collapsed: true,
+              ),
+            ),
+            Expanded(
+              child: Text(userDetails[0]),
+            ),
+            Text(value),
+            _TimeSlotCollectionButton(
+              callbackFunction: () {},
+              child: const Icon(
+                Icons.close_rounded,
+                color: AppColor.heavyRed,
+              ),
+            )
+          ],
+        ),
+      );
+    });
+
+    return meetupsWidgets;
   }
 
   @override
@@ -53,7 +114,7 @@ class _TimeSlotsState extends State<TimeSlots> {
                         width: MarginSize.small,
                       ),
                       Text(
-                        'May 24, 12:10 → May 24, 14:00',
+                        _formatDateTimeRange(widget.dateTimeRange),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const Padding(
@@ -69,14 +130,16 @@ class _TimeSlotsState extends State<TimeSlots> {
                   ),
                 ),
               ),
-              _TimeSlotButton(
+              _TimeSlotCollectionButton(
                 callbackFunction: _toggleExpansion,
                 child: const Icon(
                   Icons.keyboard_arrow_down_rounded,
                 ),
               ),
-              _TimeSlotButton(
-                callbackFunction: () {},
+              _TimeSlotCollectionButton(
+                callbackFunction: () => ref.read(deleteTimeSlotCollection)(
+                  dateTimeRange: widget.dateTimeRange,
+                ),
                 child: const Icon(
                   Icons.close_rounded,
                   color: AppColor.heavyRed,
@@ -85,40 +148,17 @@ class _TimeSlotsState extends State<TimeSlots> {
             ],
           ),
           if (expanded) ...[
-            const Padding(
-              padding: EdgeInsets.only(
+            Padding(
+              padding: const EdgeInsets.only(
                 left: PaddingSize.verySmall * 1.5,
                 top: PaddingSize.verySmall,
               ),
-              child: Text('4 meetup(s)'),
+              child: Text('${widget.meetups.length} meetup(s)'),
             ),
             const SizedBox(
               height: WhiteSpaceSize.verySmall,
             ),
-            Row(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: PaddingSize.verySmall,
-                  ),
-                  child: reusables.ProfilePicture(uid: 'uid', collapsed: true),
-                ),
-                const Expanded(
-                  child: Text('Bryan'),
-                ),
-                const Text('May 24, 12:20'),
-                _TimeSlotButton(
-                  callbackFunction: () {},
-                  child: const Icon(
-                    Icons.close_rounded,
-                    color: AppColor.heavyRed,
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(
-              height: WhiteSpaceSize.verySmall,
-            ),
+            ...meetupsInfoDisplay(widget.meetups),
           ] else
             const SizedBox(),
         ],
@@ -127,11 +167,11 @@ class _TimeSlotsState extends State<TimeSlots> {
   }
 }
 
-class _TimeSlotButton extends StatelessWidget {
+class _TimeSlotCollectionButton extends StatelessWidget {
   final void Function() callbackFunction;
   final Icon child;
 
-  const _TimeSlotButton({
+  const _TimeSlotCollectionButton({
     required this.callbackFunction,
     required this.child,
   });
