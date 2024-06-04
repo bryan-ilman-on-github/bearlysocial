@@ -21,6 +21,7 @@ import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
 import 'package:bearlysocial/utilities/cloud_services_apis.dart';
 import 'package:bearlysocial/utilities/db_operation.dart';
 import 'package:bearlysocial/utilities/dropdown_operation.dart';
+import 'package:bearlysocial/utilities/form_management.dart';
 import 'package:bearlysocial/utilities/user_permission.dart';
 import 'package:bearlysocial/views/form_fields/first_name.dart';
 import 'package:bearlysocial/views/form_fields/interest_coll.dart';
@@ -34,7 +35,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img_lib;
-import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   final ScrollController controller;
@@ -114,7 +114,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: DatabaseKey.linkedin_handle.name,
     );
 
-    ref.read(updateSchedule)(
+    ref.read(setSchedule)(
       timeSlots: SplayTreeMap.from(jsonDecode(
         DatabaseOperation.retrieveTransaction(key: DatabaseKey.schedule.name),
       )),
@@ -393,55 +393,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     horizontalPadding: PaddingSize.small,
                     verticalPadding: PaddingSize.verySmall,
                     callbackFunction: () async {
-                      List<DateTime>? timeSlotColl =
-                          await showOmniDateTimeRangePicker(
+                      List<DateTime>? dateTimeRange =
+                          await FormManagement.appDateTimeRangePicker(
                         context: context,
-                        theme: ThemeData(
-                          colorScheme: const ColorScheme.light(
-                            primary: AppColor.heavyGray,
-                            surface: Colors.transparent,
-                            onSurface: AppColor.heavyGray,
-                          ),
-                        ),
-                        is24HourMode: true,
-                        isForceEndDateAfterStartDate: true,
-                        startInitialDate:
-                            DateTime.now().add(const Duration(minutes: 10)),
-                        endInitialDate:
-                            DateTime.now().add(const Duration(minutes: 20)),
-                        startFirstDate: DateTime.now(),
-                        endFirstDate: DateTime.now(),
-                        startLastDate:
-                            DateTime.now().add(const Duration(days: 30)),
-                        endLastDate:
-                            DateTime.now().add(const Duration(days: 30)),
-                        minutesInterval: 5,
-                        borderRadius: const BorderRadius.all(Radius.circular(
-                          CurvatureSize.large,
-                        )),
-                        constraints: const BoxConstraints(
-                          maxWidth: 350,
-                          maxHeight: 650,
-                        ),
-                        transitionBuilder: (context, animA, animB, child) {
-                          return FadeTransition(
-                            opacity: animA.drive(
-                              Tween(
-                                begin: 0.0,
-                                end: 1.0,
-                              ),
-                            ),
-                            child: child,
-                          );
-                        },
-                        transitionDuration: const Duration(
-                          milliseconds: AnimationDuration.medium,
-                        ),
-                        barrierDismissible: true,
                       );
 
                       ref.read(addTimeSlotCollection)(
-                        collection: timeSlotColl,
+                        dateTimeRange: dateTimeRange,
                       );
                     },
                     buttonColor: Theme.of(context).highlightColor,
@@ -450,7 +408,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       CurvatureSize.infinity,
                     ),
                     child: Text(
-                      'Add a Time Slot',
+                      'Add Slot(s)',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).focusColor,
                           ),

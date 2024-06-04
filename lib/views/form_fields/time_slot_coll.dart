@@ -4,10 +4,10 @@ import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/pictures/profile_pic.dart' as reusables;
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
+import 'package:bearlysocial/utilities/form_management.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart';
 
 class TimeSlotCollection extends ConsumerStatefulWidget {
   final String dateTimeRange;
@@ -64,7 +64,7 @@ class _TimeSlotCollectionState extends ConsumerState<TimeSlotCollection> {
             Expanded(
               child: Text(userDetails[0]),
             ),
-            Text(value),
+            Text(key),
             _TimeSlotCollectionButton(
               callbackFunction: () {},
               child: const Icon(
@@ -106,7 +106,18 @@ class _TimeSlotCollectionState extends ConsumerState<TimeSlotCollection> {
               Expanded(
                 child: SplashButton(
                   verticalPadding: PaddingSize.verySmall,
-                  callbackFunction: _toggleExpansion,
+                  callbackFunction: () async {
+                    List<DateTime>? currDateTimeRange =
+                        await FormManagement.appDateTimeRangePicker(
+                      context: context,
+                    );
+
+                    ref.read(updateTimeSlotCollection)(
+                      prevDateTimeRange: widget.dateTimeRange,
+                      currDateTimeRange: currDateTimeRange,
+                      meetups: widget.meetups,
+                    );
+                  },
                   buttonColor: Colors.transparent,
                   child: Row(
                     children: [
