@@ -1,17 +1,15 @@
-import 'dart:convert';
-
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
 import 'package:bearlysocial/components/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/cloud_details.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
+import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http_status_code/http_status_code.dart';
 
 class HeroSection extends ConsumerStatefulWidget {
   const HeroSection({super.key});
@@ -47,25 +45,23 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
     final String emailAddr = _emailAddrController.text;
 
     await CloudUtility.sendRequest(
-      onSuccess: ,
-      onBadRequest: ,
-      image: ,
       endpoint: DigitalOceanFunctionsAPI.requestOTP,
+      method: HTTPmethod.GET.name,
       body: {
         'email_address': emailAddr,
       },
+      onSuccess: (_) {
+        setState(() {
+          _emailAddrErrTxt = null;
+        });
+        ref.read(setAuthPageEmailAddr)(emailAddr: emailAddr);
+      },
+      onBadRequest: (response) {
+        setState(() {
+          _emailAddrErrTxt = response['message'];
+        });
+      },
     );
-
-    if (response.statusCode == 200) {
-      setState(() {
-        _emailAddrErrTxt = null;
-      });
-      ref.read(setAuthPageEmailAddr)(emailAddr: emailAddr);
-    } else {
-      setState(() {
-        _emailAddrErrTxt = jsonDecode(response.body)['message'];
-      });
-    }
 
     _blockInput = false;
   }
