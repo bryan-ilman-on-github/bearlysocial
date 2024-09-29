@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
+import 'package:bearlysocial/constants/cloud_details.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/constants/cloud_services_details.dart';
-import 'package:bearlysocial/providers/auth_details/auth_page_email_address_state.dart';
+import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
 import 'package:bearlysocial/providers/auth_details/auth_state.dart';
-import 'package:bearlysocial/utilities/cloud_services_apis.dart';
-import 'package:bearlysocial/utilities/db_operation.dart';
+import 'package:bearlysocial/utils/cloud_util.dart';
+import 'package:bearlysocial/utils/local_db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,8 +26,59 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
   final List<String> _otp = ['', '', '', '', '', ''];
   String _otpErrorText = '';
 
+  void _validateOTP() async {
+    String uid = LocalDatabaseUtilities.getSHA256(
+      input: ref.read(authPageEmailAddress),
+    ).substring(0, 24);
+
+    final Response httpResponse = await DigitalOceanUtilities.performRequest(
+      endpoint: DigitalOceanFunctionsAPI.validateOTP,
+      body: {
+        'id': uid,
+        'otp': _otp.join(),
+      },
+    );
+
+    if (httpResponse.statusCode == 200) {
+      DigitalOceanUtilities.downloadProfilePic(
+        uid: uid,
+      ).then((base64ProfilePic) {
+        if (base64ProfilePic != null) {
+          LocalDatabaseUtility.insertTransaction(
+            key: DatabaseKey.base_64_profile_pic.name,
+            value: base64ProfilePic,
+          );
+        }
+      });
+
+      LocalDB.insertTransactions(
+        pairs: Map<String, String>.from(
+          jsonDecode(httpResponse.body).map(
+            (key, value) => MapEntry<String, String>(
+              key,
+              value?.toString() ?? '',
+            ),
+          )..removeWhere(
+              (_, value) => value == null || value.isEmpty,
+            ),
+        ),
+      );
+      ref.read(enterApp)();
+
+      ref.read(setAuthPageEmailAddress)(
+        emailAddress: null,
+      );
+    } else {
+      setState(() {
+        _otpErrorText = jsonDecode(httpResponse.body)['message'];
+      });
+    }
+
+    _enabled = true;
+  }
+
   void _goBack() {
-    ref.read(setAuthenticationPageEmailAddress)(emailAddress: '');
+    ref.read(setAuthPageEmailAddress)(emailAddress: null);
 
     _enabled = true;
 
@@ -47,7 +98,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
               ),
         ),
         Text(
-          "We've sent a one-time password (OTP) to ${ref.watch(authenticationPageEmailAddress)}.",
+          "We've sent a one-time password (OTP) to ${ref.watch(authPageEmailAddress)}.",
           maxLines: 4,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
@@ -69,90 +120,18 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                   FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                 ],
                 textAlign: TextAlign.center,
-                onChanged: (value) async {
-                  _otp[index] = value;
+                onChanged: _enabled
+                    ? (value) {
+                        _otp[index] = value;
 
-                  if (value.isNotEmpty && index < _otp.length - 1) {
-                    FocusScope.of(context).nextFocus();
-                  } else if (value.isNotEmpty) {
-                    setState(() {
-                      _enabled = false;
-                    });
-
-                    String uid = DatabaseOperation.getSHA256(
-                      input: ref.read(authenticationPageEmailAddress),
-                    ).substring(0, 16);
-
-                    final Response httpResponse =
-                        await AmazonWebServicesLambdaAPI.postRequest(
-                      endpoint: AmazonWebServicesLambdaEndpoints.validateOTP,
-                      body: {
-                        'id': uid,
-                        'otp': _otp.join(),
-                      },
-                    );
-
-                    if (httpResponse.statusCode == 200) {
-                      DigitalOceanSpacesAPI.downloadProfilePic(
-                        uid: uid,
-                      ).then((base64ProfilePic) {
-                        if (base64ProfilePic != null) {
-                          DatabaseOperation.insertTransaction(
-                            key: DatabaseKey.base_64_profile_pic.name,
-                            value: base64ProfilePic,
-                          );
+                        if (value.isNotEmpty && index < _otp.length - 1) {
+                          FocusScope.of(context).nextFocus();
+                        } else if (value.isNotEmpty) {
+                          _enabled = false;
+                          _validateOTP();
                         }
-                      });
-
-                      DatabaseOperation.insertTransactions(
-                        pairs: Map<String, String>.from(
-                          jsonDecode(httpResponse.body).map(
-                            (key, value) => MapEntry<String, String>(
-                              key,
-                              value?.toString() ?? '',
-                            ),
-                          )..removeWhere(
-                              (_, value) => value == null || value.isEmpty,
-                            ),
-                        ),
-                      );
-                      ref.read(enterApp)();
-
-                      ref.read(setAuthenticationPageEmailAddress)(
-                        emailAddress: '',
-                      );
-                    } else {
-                      final message = jsonDecode(httpResponse.body)['message'];
-                      if (message != null) {
-                        setState(() {
-                          _otpErrorText = message;
-                          _enabled = true;
-                        });
-                      } else {
-                        dynamic cooldownTime =
-                            jsonDecode(httpResponse.body)['cooldown_time'];
-                        dynamic remainingMinutes;
-
-                        if (cooldownTime != null) {
-                          cooldownTime = int.parse(cooldownTime);
-                          DateTime now = DateTime.now();
-                          cooldownTime =
-                              DateTime.fromMillisecondsSinceEpoch(cooldownTime);
-                          remainingMinutes =
-                              cooldownTime.difference(now).inMinutes;
-                          if (remainingMinutes < 0) remainingMinutes = 0;
-                        } else {
-                          remainingMinutes = 'unknown';
-                        }
-
-                        setState(() {
-                          _otpErrorText =
-                              'Email requests exceeded. Retry in $remainingMinutes minute(s).';
-                        });
                       }
-                    }
-                  }
-                },
+                    : null,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: _enabled ? null : Theme.of(context).highlightColor,
                     ),
@@ -231,13 +210,13 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                   ),
                   const SizedBox(
                     width: MarginSize.small,
-                  )
+                  ),
                 ],
               ),
             ),
             const Spacer(),
           ],
-        )
+        ),
       ],
     );
   }

@@ -2,7 +2,7 @@ import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/texts/decorated_txt.dart';
 import 'package:bearlysocial/components/pictures/profile_pic.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/utilities/form_management.dart';
+import 'package:bearlysocial/utils/form_utils.dart';
 import 'package:flutter/material.dart';
 
 class ProfileCard extends StatelessWidget {

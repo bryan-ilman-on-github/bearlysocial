@@ -3,16 +3,15 @@ import 'dart:convert';
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
 import 'package:bearlysocial/components/lines/progress_spinner.dart';
+import 'package:bearlysocial/constants/cloud_details.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/constants/cloud_services_details.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:bearlysocial/providers/auth_details/auth_page_email_address_state.dart';
-import 'package:bearlysocial/utilities/cloud_services_apis.dart';
-import 'package:bearlysocial/utilities/db_operation.dart';
-import 'package:bearlysocial/utilities/form_management.dart';
+import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
+import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http_status_code/http_status_code.dart';
 
 class HeroSection extends ConsumerStatefulWidget {
   const HeroSection({super.key});
@@ -24,83 +23,51 @@ class HeroSection extends ConsumerStatefulWidget {
 class _HeroSectionState extends ConsumerState<HeroSection> {
   bool _blockInput = false;
 
-  final FocusNode _emailAddressFocusNode = FocusNode();
-  final TextEditingController _emailAddressController = TextEditingController();
+  final FocusNode _emailAddrFocusNode = FocusNode();
+  final TextEditingController _emailAddrController = TextEditingController();
 
-  String? _emailAddressErrorText;
+  String? _emailAddrErrTxt;
 
   @override
   void initState() {
     super.initState();
 
-    _emailAddressFocusNode.addListener(() {
+    _emailAddrFocusNode.addListener(() {
       setState(() {});
     });
   }
 
   @override
   void dispose() {
-    _emailAddressFocusNode.dispose();
-
+    _emailAddrFocusNode.dispose();
     super.dispose();
   }
 
-  void _continue() async {
-    _blockInput = true;
+  void _requestOTP() async {
+    final String emailAddr = _emailAddrController.text;
 
-    final String emailAddress = _emailAddressController.text;
-
-    bool emailAddressIsvalid = FormManagement.validateEmailAddress(
-      emailAddress: emailAddress,
+    await CloudUtility.sendRequest(
+      onSuccess: ,
+      onBadRequest: ,
+      image: ,
+      endpoint: DigitalOceanFunctionsAPI.requestOTP,
+      body: {
+        'email_address': emailAddr,
+      },
     );
 
-    if (emailAddressIsvalid) {
+    if (response.statusCode == 200) {
       setState(() {
-        _emailAddressErrorText = null;
+        _emailAddrErrTxt = null;
       });
-
-      String id = DatabaseOperation.getSHA256(
-        input: emailAddress,
-      ).substring(0, 16);
-
-      final response = await AmazonWebServicesLambdaAPI.postRequest(
-        endpoint: AmazonWebServicesLambdaEndpoints.sendOTPviaEmail,
-        body: {
-          'id': id,
-          'email_address': emailAddress,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        _blockInput = false;
-
-        ref.read(setAuthenticationPageEmailAddress)(emailAddress: emailAddress);
-      } else {
-        dynamic cooldownTime = jsonDecode(response.body)['cooldown_time'];
-        dynamic remainingMinutes;
-
-        if (cooldownTime != null) {
-          cooldownTime = int.parse(cooldownTime);
-          DateTime now = DateTime.now();
-          cooldownTime = DateTime.fromMillisecondsSinceEpoch(cooldownTime);
-          remainingMinutes = cooldownTime.difference(now).inMinutes;
-          if (remainingMinutes < 0) remainingMinutes = 0;
-        } else {
-          remainingMinutes = 'unknown';
-        }
-
-        setState(() {
-          _emailAddressErrorText =
-              'Email requests exceeded. Retry in $remainingMinutes minute(s).';
-          _blockInput = false;
-        });
-      }
+      ref.read(setAuthPageEmailAddr)(emailAddr: emailAddr);
     } else {
       setState(() {
-        _emailAddressErrorText = 'Please type your valid email address.';
-        _blockInput = false;
+        _emailAddrErrTxt = jsonDecode(response.body)['message'];
       });
     }
+
+    _blockInput = false;
   }
 
   @override
@@ -127,11 +94,11 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
           height: WhiteSpaceSize.veryLarge,
         ),
         UnderlinedTextField(
-          enabled: ref.watch(authenticationPageEmailAddress).isEmpty,
-          label: TranslationKey.emailAddressLabel.name.tr(),
-          controller: _emailAddressController,
-          focusNode: _emailAddressFocusNode,
-          errorText: _emailAddressErrorText,
+          enabled: ref.watch(authPageEmailAddr).isEmpty,
+          label: TranslationKey.emailAddrLabel.name.tr(),
+          controller: _emailAddrController,
+          focusNode: _emailAddrFocusNode,
+          errorText: _emailAddrErrTxt,
         ),
         const SizedBox(
           height: WhiteSpaceSize.large,
@@ -142,10 +109,13 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
           borderRadius: BorderRadius.circular(
             CurvatureSize.large,
           ),
-          callbackFunction: ref.watch(authenticationPageEmailAddress).isEmpty
+          callbackFunction: ref.watch(authPageEmailAddr).isEmpty
               ? _blockInput
                   ? null
-                  : _continue
+                  : () {
+                      _blockInput = true;
+                      _requestOTP();
+                    }
               : null,
           shadow: Shadow.medium,
           child: _blockInput

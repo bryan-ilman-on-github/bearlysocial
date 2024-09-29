@@ -4,7 +4,7 @@ import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/pictures/profile_pic.dart' as reusables;
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
-import 'package:bearlysocial/utilities/form_management.dart';
+import 'package:bearlysocial/utils/form_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

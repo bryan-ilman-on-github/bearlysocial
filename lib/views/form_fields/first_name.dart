@@ -3,7 +3,7 @@ import 'package:bearlysocial/providers/form_fields/first_name_focus_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FirstName extends ConsumerWidget {
+class FirstNameTextField extends ConsumerWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
 

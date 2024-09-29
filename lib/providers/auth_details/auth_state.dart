@@ -1,7 +1,7 @@
 import 'package:bearlysocial/constants/db_key.dart';
-import 'package:bearlysocial/constants/cloud_services_details.dart';
-import 'package:bearlysocial/utilities/cloud_services_apis.dart';
-import 'package:bearlysocial/utilities/db_operation.dart';
+import 'package:bearlysocial/constants/cloud_details.dart';
+import 'package:bearlysocial/utils/cloud_util.dart';
+import 'package:bearlysocial/utils/local_db.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthenticationStateNotifier extends StateNotifier<bool> {
@@ -12,18 +12,15 @@ class AuthenticationStateNotifier extends StateNotifier<bool> {
   }
 
   void exitApp() {
-    DatabaseOperation.emptyDatabase();
+    LocalDB.emptyDatabase();
     state = false;
   }
 
   Future<void> validateToken() async {
     late String txnId, txnToken;
 
-    [txnId, txnToken] = DatabaseOperation.retrieveTransactions(
-      keys: [
-        DatabaseKey.id.name,
-        DatabaseKey.token.name,
-      ],
+    [txnId, txnToken] = LocalDB.retrieveTransactions(
+      keys: [DatabaseKey.id.name, DatabaseKey.token.name],
     );
 
     final response = await AmazonWebServicesLambdaAPI.postRequest(
@@ -41,7 +38,7 @@ class AuthenticationStateNotifier extends StateNotifier<bool> {
   Future<void> deleteAccount() async {
     late String txnId, txnToken;
 
-    [txnId, txnToken] = DatabaseOperation.retrieveTransactions(
+    [txnId, txnToken] = LocalDB.retrieveTransactions(
       keys: [
         DatabaseKey.id.name,
         DatabaseKey.token.name,
@@ -74,10 +71,6 @@ final enterApp = Provider((ref) {
 
 final exitApp = Provider((ref) {
   return ref.read(authenticationStateNotifierProvider.notifier).exitApp;
-});
-
-final validateToken = Provider((ref) {
-  return ref.read(authenticationStateNotifierProvider.notifier).validateToken;
 });
 
 final deleteAccount = Provider((ref) {

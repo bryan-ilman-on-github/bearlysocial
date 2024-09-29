@@ -5,9 +5,9 @@ import 'package:hashlib/hashlib.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// This class handles all database operations for the application.
-class DatabaseOperation {
-  /// Creates a connection to the Isar database.
+/// This class provides utility functions to interact with the local database.
+class LocalDatabaseUtility {
+  /// This function creates a connection to the local database.
   ///
   /// This function is asynchronous and returns a Future that completes when the connection is established.
   static Future<void> createConnection() async {
@@ -19,6 +19,10 @@ class DatabaseOperation {
     );
   }
 
+  /// This function inserts a single transaction into the local database.
+  ///
+  /// The `key` parameter is the key for the transaction.
+  /// The `value` parameter is the value for the transaction.
   static void insertTransaction({
     required String key,
     required String value,
@@ -34,7 +38,7 @@ class DatabaseOperation {
     );
   }
 
-  /// Inserts transactions into the database.
+  /// This function inserts multiple transactions into the local database.
   ///
   /// The `pairs` parameter is a map of key-value pairs to be inserted as transactions.
   static void insertTransactions({
@@ -53,6 +57,9 @@ class DatabaseOperation {
     );
   }
 
+  /// This function retrieves a single transaction from the local database.
+  ///
+  /// The `key` parameter is the key for the transaction to be retrieved.
   static String retrieveTransaction({
     required String key,
   }) {
@@ -64,9 +71,7 @@ class DatabaseOperation {
     return transaction?.value ?? '';
   }
 
-  /// Retrieves transactions from the database.
-  ///
-  /// This function returns a list of transactions.
+  /// This function retrieves multiple transactions from the local database.
   ///
   /// The `keys` parameter is a list of keys for the transactions to be retrieved.
   static List<String> retrieveTransactions({
@@ -80,7 +85,7 @@ class DatabaseOperation {
     return txns?.map((txn) => txn?.value ?? '').toList() ?? [];
   }
 
-  /// Generates a SHA-256 hash of the input string.
+  /// This function generates a SHA-256 hash of the input string.
   ///
   /// The `input` parameter is the string to be hashed.
   static String getSHA256({
@@ -91,7 +96,7 @@ class DatabaseOperation {
     return digest.toString();
   }
 
-  /// Empties the database.
+  /// This function empties the local database.
   static void emptyDatabase() {
     final Isar? dbConnection = Isar.getInstance();
     dbConnection?.writeTxnSync(() => dbConnection.clearSync());

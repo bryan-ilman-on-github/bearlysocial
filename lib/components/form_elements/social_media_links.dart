@@ -1,6 +1,6 @@
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
-import 'package:bearlysocial/utilities/db_operation.dart';
+import 'package:bearlysocial/utilities/local_db_servicesdart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
 
-class SelfieCaptureOperation {
+class SelfieCaptureUtility {
   static double calculateCameraFrameSize({
     required Size screenSize,
   }) {

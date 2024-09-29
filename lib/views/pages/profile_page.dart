@@ -18,11 +18,11 @@ import 'package:bearlysocial/providers/form_fields/profile_pic_loading_state.dar
 import 'package:bearlysocial/providers/form_fields/profile_pic_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_save_state.dart';
 import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
-import 'package:bearlysocial/utilities/cloud_services_apis.dart';
-import 'package:bearlysocial/utilities/db_operation.dart';
-import 'package:bearlysocial/utilities/dropdown_operation.dart';
-import 'package:bearlysocial/utilities/form_management.dart';
-import 'package:bearlysocial/utilities/user_permission.dart';
+import 'package:bearlysocial/utils/cloud_util.dart';
+import 'package:bearlysocial/utilities/local_db_servicesdart';
+import 'package:bearlysocial/utils/dropdown_operation.dart';
+import 'package:bearlysocial/utils/form_utils.dart';
+import 'package:bearlysocial/utils/user_permission_utils.dart';
 import 'package:bearlysocial/views/form_fields/first_name.dart';
 import 'package:bearlysocial/views/form_fields/interest_coll.dart';
 import 'package:bearlysocial/views/form_fields/lang_coll.dart';

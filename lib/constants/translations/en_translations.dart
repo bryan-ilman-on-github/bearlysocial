@@ -1,6 +1,6 @@
 import 'package:bearlysocial/constants/translation_key.dart';
 
-Map<String, String> enFragMapping = {
+Map<String, String> enTranslations = {
   /// buttons
   TranslationKey.signUpButton.name: 'Sign Up',
   TranslationKey.signInButton.name: 'Sign In',

@@ -1,5 +1,5 @@
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/providers/auth_details/auth_page_email_address_state.dart';
+import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
 import 'package:bearlysocial/views/sections/hero_section.dart';
 import 'package:bearlysocial/views/sections/otp_section.dart';
 import 'package:flutter/material.dart';
@@ -47,9 +47,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                 Stack(
                   children: <Widget>[
                     AnimatedOpacity(
-                      opacity: ref.watch(authenticationPageEmailAddress).isEmpty
-                          ? 1.0
-                          : 0.0,
+                      opacity: ref.watch(authPageEmailAddr).isEmpty ? 1.0 : 0.0,
                       duration: const Duration(
                         milliseconds: AnimationDuration.medium,
                       ),
@@ -57,9 +55,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     ),
                     AnimatedOpacity(
                       opacity:
-                          ref.watch(authenticationPageEmailAddress).isNotEmpty
-                              ? 1.0
-                              : 0.0,
+                          ref.watch(authPageEmailAddr).isNotEmpty ? 1.0 : 0.0,
                       duration: const Duration(
                         milliseconds: AnimationDuration.medium,
                       ),
@@ -68,7 +64,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                           milliseconds: AnimationDuration.medium,
                         ),
                         transform: Matrix4.translationValues(
-                          ref.watch(authenticationPageEmailAddress).isNotEmpty
+                          ref.watch(authPageEmailAddr).isNotEmpty
                               ? 0
                               : MediaQuery.of(context).size.width / 2,
                           0,
