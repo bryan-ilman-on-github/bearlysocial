@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bearlysocial/aliases/URI.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:http_status_code/http_status_code.dart';
@@ -38,10 +37,11 @@ class CloudUtility {
   }) async {
     var url = URI.parse(endpoint);
     String token = 'your-token-from-database'; // TODO: from local storage
-
     http.BaseRequest request;
+
     if (method == 'POST' || method == 'PUT') {
       request = http.MultipartRequest(method, url);
+
       if (body != null) {
         (request as http.MultipartRequest).fields['json'] = jsonEncode(body);
       }
@@ -62,14 +62,12 @@ class CloudUtility {
     }
 
     request.headers['Authorization'] = 'Bearer $token';
-    final response = await request.send();
-
-    final parsedResponse = await _parseResponse(response);
+    final response = await _parseResponse(await request.send());
 
     if (response.statusCode == StatusCode.OK) {
-      onSuccess(parsedResponse);
+      onSuccess(response);
     } else if (response.statusCode == StatusCode.BAD_REQUEST) {
-      onBadRequest(parsedResponse);
+      onBadRequest(response);
     } else if (response.statusCode == StatusCode.UNAUTHORIZED) {
       // TODO: Log the user out of the app
     } else {
@@ -79,6 +77,7 @@ class CloudUtility {
 
   static Future<dynamic> _parseResponse(http.StreamedResponse response) async {
     final contentType = response.headers['content-type'];
+
     if (contentType != null && contentType.contains('application/json')) {
       return jsonDecode(await response.stream.bytesToString());
     } else {
