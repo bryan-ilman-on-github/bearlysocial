@@ -1,7 +1,7 @@
 import 'package:bearlysocial/constants/db_key.dart';
-import 'package:bearlysocial/constants/cloud_details.dart';
+import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
-import 'package:bearlysocial/utils/local_db.dart';
+import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthenticationStateNotifier extends StateNotifier<bool> {

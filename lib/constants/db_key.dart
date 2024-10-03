@@ -1,5 +1,5 @@
 enum DatabaseKey {
-  id,
+  uid,
   token,
   base_64_profile_pic,
   first_name,

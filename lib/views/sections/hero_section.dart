@@ -1,7 +1,7 @@
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
 import 'package:bearlysocial/components/lines/progress_spinner.dart';
-import 'package:bearlysocial/constants/cloud_details.dart';
+import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
@@ -19,7 +19,7 @@ class HeroSection extends ConsumerStatefulWidget {
 }
 
 class _HeroSectionState extends ConsumerState<HeroSection> {
-  bool _blockInput = false;
+  bool _canInvokeCallback = true;
 
   final FocusNode _emailAddrFocusNode = FocusNode();
   final TextEditingController _emailAddrController = TextEditingController();
@@ -45,7 +45,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
     final String emailAddr = _emailAddrController.text;
 
     await CloudUtility.sendRequest(
-      endpoint: DigitalOceanFunctionsAPI.requestOTP,
+      endpoint: DigitalOceanDropletAPI.requestOTP,
       method: HTTPmethod.GET.name,
       body: {
         'email_address': emailAddr,
@@ -63,7 +63,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
       },
     );
 
-    _blockInput = false;
+    _canInvokeCallback = true;
   }
 
   @override
@@ -106,21 +106,21 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
             CurvatureSize.large,
           ),
           callbackFunction: ref.watch(authPageEmailAddr).isEmpty
-              ? _blockInput
-                  ? null
-                  : () {
-                      _blockInput = true;
+              ? _canInvokeCallback
+                  ? () {
+                      _canInvokeCallback = false;
                       _requestOTP();
                     }
+                  : null
               : null,
           shadow: Shadow.medium,
-          child: _blockInput
-              ? const ProgressSpinner(
-                  invertColor: true,
-                )
-              : Text(
+          child: _canInvokeCallback
+              ? Text(
                   'Continue',
                   style: Theme.of(context).textTheme.titleMedium,
+                )
+              : const ProgressSpinner(
+                  invertColor: true,
                 ),
         ),
       ],
