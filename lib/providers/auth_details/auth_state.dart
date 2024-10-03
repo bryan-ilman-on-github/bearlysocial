@@ -12,14 +12,14 @@ class AuthenticationStateNotifier extends StateNotifier<bool> {
   }
 
   void exitApp() {
-    LocalDB.emptyDatabase();
+    LocalDatabaseUtility.emptyDatabase();
     state = false;
   }
 
   Future<void> validateToken() async {
     late String txnId, txnToken;
 
-    [txnId, txnToken] = LocalDB.retrieveTransactions(
+    [txnId, txnToken] = LocalDatabaseUtility.retrieveTransactions(
       keys: [DatabaseKey.id.name, DatabaseKey.token.name],
     );
 

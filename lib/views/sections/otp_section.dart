@@ -5,7 +5,7 @@ import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
-import 'package:bearlysocial/constants/symbol.dart';
+import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
 import 'package:bearlysocial/providers/auth_details/auth_state.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
@@ -24,8 +24,8 @@ class OTPsection extends ConsumerStatefulWidget {
 class _OTPsectionState extends ConsumerState<OTPsection> {
   bool _canInvokeCallback = true;
 
-  final List<String> _otp = List.filled(6, Symbol.emptyString);
-  String _otpErrorText = Symbol.emptyString;
+  final List<String> _otp = List.filled(6, '');
+  String _otpErrorText = '';
 
   void _validateOTP() async {
     await CloudUtility.sendRequest(
@@ -53,7 +53,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
             response.map(
               (key, value) => MapEntry<String, String>(
                 key,
-                value?.toString() ?? Symbol.emptyString,
+                value?.toString() ?? '',
               ),
             )..removeWhere(
                 (_, value) => value == null || value.isEmpty,
@@ -64,7 +64,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
         ref.read(enterApp)();
 
         ref.read(setAuthPageEmailAddr)(
-          emailAddr: Symbol.emptyString,
+          emailAddr: '',
         );
       },
       onBadRequest: (response) {
@@ -78,8 +78,8 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
   }
 
   void _goBack() {
-    ref.read(setAuthPageEmailAddr)(emailAddr: Symbol.emptyString);
-    _otpErrorText = Symbol.emptyString;
+    ref.read(setAuthPageEmailAddr)(emailAddr: '');
+    _otpErrorText = '';
     _canInvokeCallback = true;
   }
 

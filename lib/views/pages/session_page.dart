@@ -16,9 +16,9 @@ class SessionPage extends StatefulWidget {
 
 class _SessionPage extends State<SessionPage> {
   Map<String, Map<String, dynamic>> _navItems = {};
-  List<Widget> _pages = [];
-
   int _selectedIndex = 0;
+
+  List<Widget> _pages = [];
 
   late ScrollController _controller;
   bool _showingScrollButton = false;
@@ -82,7 +82,6 @@ class _SessionPage extends State<SessionPage> {
     super.initState();
 
     _pages = _initPages();
-
     _navItems = {
       'Explore': {
         'normalIcon': Icons.explore_outlined,

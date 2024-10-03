@@ -5,24 +5,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
-/// This class provides utility functions for form operations.
-class FormUtils {
-  /// This function validates an email address using a regular expression.
+/// This class provides utility functions for handling various form-related operations.
+class FormUtility {
+  /// Checks if at least one element is shared between two lists.
   ///
-  /// The `emailAddress` parameter is the email address to be validated.
-  static bool validateEmailAddress({
-    required String emailAddress,
-  }) {
-    final RegExp emailRegExp = RegExp(
-      r'^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$',
-    );
-
-    return emailRegExp.hasMatch(emailAddress);
-  }
-
-  /// This function checks if two lists contain the same elements.
+  /// The `listA` and `listB` parameters represent the two lists being compared.
   ///
-  /// The `listA` and `listB` parameters are the lists to be compared.
+  /// This function converts both lists to sets and checks if they have any overlapping elements.
+  /// Returns `true` if there is at least one common element; otherwise, returns `false`.
   static bool doListsContainSameElements({
     required List<dynamic> listA,
     required List<dynamic> listB,
@@ -31,9 +21,12 @@ class FormUtils {
         Set.from(listB).difference(Set.from(listA)).isEmpty;
   }
 
-  /// This function calculates a color based on a rating value.
+  /// Calculates a color based on a rating value, creating a gradient effect from red to green.
   ///
-  /// The `rating` parameter is a value between 0.0 and 5.0 that determines the color.
+  /// The `rating` parameter is a double between 0.0 and 5.0.
+  ///
+  /// The function interpolates between three colors: red (low rating), yellow (middle rating), and green (high rating).
+  /// Returns a color representing the rating. Defaults to transparent if no color is determined.
   static Color calculateRatingColor({
     required double rating,
   }) {
@@ -65,11 +58,12 @@ class FormUtils {
     return ratingColor ?? Colors.transparent;
   }
 
-  /// This function displays a date-time range picker dialog.
+  /// Opens a date-time range picker with specified configuration and returns the selected date range.
   ///
-  /// The `context` parameter is the BuildContext used to display the dialog.
-  /// The function returns a Future that completes with a list containing the start and end DateTime,
-  /// or `null` if the dialog is dismissed.
+  /// The `context` parameter is required to display the picker in the proper location.
+  ///
+  /// Returns a `Future<List<DateTime>?>` representing the selected start and end dates, or null if the picker is dismissed.
+  /// The picker is configured for 24-hour mode, with specific start and end ranges and customizable transition effects.
   static Future<List<DateTime>?> appDateTimeRangePicker({
     required context,
   }) {
@@ -116,30 +110,30 @@ class FormUtils {
     );
   }
 
-  /// This function builds a list of DropdownMenuEntry from a map of entries.
+  /// Builds a dropdown menu from a map of entries.
   ///
-  /// The `entries` parameter is a map where keys are menu item labels and values are the corresponding values.
+  /// The `entries` parameter is a map where keys represent labels and values represent corresponding dropdown values.
+  ///
+  /// Returns a list of `DropdownMenuEntry` objects, each containing a label and value from the provided entries map.
   static List<DropdownMenuEntry> buildDropdownMenu({
     required Map<String, dynamic> entries,
   }) {
     final List<DropdownMenuEntry> menu = <DropdownMenuEntry>[];
 
     entries.forEach((key, value) {
-      menu.add(
-        DropdownMenuEntry(
-          value: value,
-          label: key,
-        ),
-      );
+      menu.add(DropdownMenuEntry(value: value, label: key));
     });
 
     return menu;
   }
 
-  /// This function builds a list of Tag widgets from a list of labels.
+  /// Builds a list of tags from a given collection of strings.
   ///
-  /// The `collection` parameter is a list of labels for the tags.
-  /// The `callbackFunction` parameter is a function to be called when a tag is interacted with.
+  /// The `collection` parameter represents the list of strings to convert into tags.
+  ///
+  /// The `callbackFunction` parameter is the function invoked when the tag is interacted with.
+  ///
+  /// Returns a list of `Tag` objects, each created with a label from the `collection` and linked to the provided `callbackFunction`.
   static List<Tag> buildTags({
     required List<String> collection,
     required Function callbackFunction,
@@ -148,17 +142,18 @@ class FormUtils {
 
     for (var label in collection) {
       tags.add(
-        Tag(
-          label: label,
-          callbackFunction: callbackFunction,
-        ),
+        Tag(label: label, callbackFunction: callbackFunction),
       );
     }
 
     return tags;
   }
 
-  /// This getter returns a map of all interests with their corresponding TranslationKey.
+  /// Retrieves all translation keys related to user interests.
+  ///
+  /// This getter filters the `TranslationKey` enum values to return only those containing the 'INTEREST_LBL' label.
+  ///
+  /// Returns a map where each key represents the translated interest name and the value is the corresponding `TranslationKey`.
   static Map<String, TranslationKey> get allInterests {
     final List<TranslationKey> interestKeys = TranslationKey.values
         .where((key) => key.toString().contains('INTEREST_LBL'))

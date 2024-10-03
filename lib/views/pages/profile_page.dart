@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types
+
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
@@ -19,10 +21,9 @@ import 'package:bearlysocial/providers/form_fields/profile_pic_state.dart';
 import 'package:bearlysocial/providers/form_fields/profile_save_state.dart';
 import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
-import 'package:bearlysocial/utilities/local_db_servicesdart';
-import 'package:bearlysocial/utils/dropdown_operation.dart';
-import 'package:bearlysocial/utils/form_utils.dart';
-import 'package:bearlysocial/utils/user_permission_utils.dart';
+import 'package:bearlysocial/utils/form_util.dart';
+import 'package:bearlysocial/utils/local_db_util.dart';
+import 'package:bearlysocial/utils/user_permission_util.dart';
 import 'package:bearlysocial/views/form_fields/first_name.dart';
 import 'package:bearlysocial/views/form_fields/interest_coll.dart';
 import 'package:bearlysocial/views/form_fields/lang_coll.dart';
@@ -35,6 +36,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img_lib;
+
+typedef local_db = LocalDatabaseUtility;
+typedef db_key = DatabaseKey;
 
 class ProfilePage extends ConsumerStatefulWidget {
   final ScrollController controller;
@@ -49,74 +53,75 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
+  // Flags for managing state changes.
   bool _resettingChanges = false;
   bool _applyingChanges = false;
 
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _interestController = TextEditingController();
-  final TextEditingController _langController = TextEditingController();
+  // Text controllers for personal details.
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _interestController = TextEditingController();
+  final _langController = TextEditingController();
 
-  final TextEditingController _instaLinkController = TextEditingController();
-  final TextEditingController _facebookLinkController = TextEditingController();
-  final TextEditingController _linkedinLinkController = TextEditingController();
+  // Text controllers for social media links.
+  final _instaLinkController = TextEditingController();
+  final _facebookLinkController = TextEditingController();
+  final _linkedinLinkController = TextEditingController();
 
-  final FocusNode _firstNameFocusNode = FocusNode();
-  final FocusNode _lastNameFocusNode = FocusNode();
+  // Focus nodes for managing text field focus.
+  final _firstNameFocusNode = FocusNode();
+  final _lastNameFocusNode = FocusNode();
 
-  void _syncWithDatabase() {
+  void _syncWithDatabase() async {
     ref.read(setProfilePicLoadingState)(
       isProfilePicBeingLoaded: true,
     );
 
-    String base64ProfilePic = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.base_64_profile_pic.name,
-    );
+    await Future.delayed(Duration(seconds: 10)); // TODO: check this!
 
+    String base64ProfilePic = local_db.retrieveTransaction(
+      key: db_key.base_64_profile_pic.name,
+    );
     if (base64ProfilePic.isNotEmpty) {
       ref.read(setProfilePic)(
         pic: img_lib.decodeImage(base64Decode(base64ProfilePic)),
       );
     }
 
-    _firstNameController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.first_name.name,
+    _firstNameController.text = local_db.retrieveTransaction(
+      key: db_key.first_name.name,
     );
-    _lastNameController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.last_name.name,
+    _lastNameController.text = local_db.retrieveTransaction(
+      key: db_key.last_name.name,
     );
 
     ref.read(setInterestCollection)(
-      collection: jsonDecode(
-        DatabaseOperation.retrieveTransaction(
-          key: DatabaseKey.interest_coll_code.name,
-        ),
-      ).cast<String>(),
+      collection: jsonDecode(local_db.retrieveTransaction(
+        key: db_key.interest_coll_code.name,
+      )).cast<String>(),
     );
     ref.read(setLangCollection)(
-      collection: jsonDecode(
-        DatabaseOperation.retrieveTransaction(
-          key: DatabaseKey.lang_coll_code.name,
-        ),
-      ).cast<String>(),
+      collection: jsonDecode(local_db.retrieveTransaction(
+        key: db_key.lang_coll_code.name,
+      )).cast<String>(),
     );
 
     _interestController.text = '';
     _langController.text = '';
 
-    _instaLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.insta_handle.name,
+    _instaLinkController.text = local_db.retrieveTransaction(
+      key: db_key.insta_handle.name,
     );
-    _facebookLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.fb_handle.name,
+    _facebookLinkController.text = local_db.retrieveTransaction(
+      key: db_key.fb_handle.name,
     );
-    _linkedinLinkController.text = DatabaseOperation.retrieveTransaction(
-      key: DatabaseKey.linkedin_handle.name,
+    _linkedinLinkController.text = local_db.retrieveTransaction(
+      key: db_key.linkedin_handle.name,
     );
 
     ref.read(setSchedule)(
       timeSlots: SplayTreeMap.from(jsonDecode(
-        DatabaseOperation.retrieveTransaction(key: DatabaseKey.schedule.name),
+        local_db.retrieveTransaction(key: db_key.schedule.name),
       )),
     );
 
@@ -130,7 +135,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   void _addInterest() {
-    if (DropdownOperation.allInterests.containsKey(_interestController.text)) {
+    if (FormUtility.allInterests.containsKey(_interestController.text)) {
       if (ref.read(interestCollection).length >= 4) {
         ref.read(removeFirstLabelFromInterestCollection)();
       }
@@ -184,7 +189,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<CameraDescription?> _getFrontCam() async {
-    final bool camAllowed = await UserPermission.cameraPermission;
+    final bool camAllowed = await UserPermissionUtility.cameraPermission;
 
     if (camAllowed) {
       return (await availableCameras()).firstWhere(
@@ -207,8 +212,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (ref.read(profilePic) != null) {
       DigitalOceanSpacesAPI.uploadProfilePic(
         profilePic: ref.read(profilePic) as img_lib.Image,
-        uid: DatabaseOperation.retrieveTransaction(
-          key: DatabaseKey.id.name,
+        uid: local_db.retrieveTransaction(
+          key: db_key.id.name,
         ),
       );
     }

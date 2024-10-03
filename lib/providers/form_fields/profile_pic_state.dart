@@ -11,15 +11,15 @@ class ProfilePictureStateNotifier extends StateNotifier<img_lib.Image?> {
   }
 }
 
-final profilePictureStateNotifierProvider =
+final profilePicStateNotifierProvider =
     StateNotifierProvider<ProfilePictureStateNotifier, img_lib.Image?>(
   (ref) => ProfilePictureStateNotifier(),
 );
 
 final profilePic = Provider((ref) {
-  return ref.watch(profilePictureStateNotifierProvider);
+  return ref.watch(profilePicStateNotifierProvider);
 });
 
 final setProfilePic = Provider((ref) {
-  return ref.read(profilePictureStateNotifierProvider.notifier).setPic;
+  return ref.read(profilePicStateNotifierProvider.notifier).setPic;
 });
