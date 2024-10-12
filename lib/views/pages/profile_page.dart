@@ -7,17 +7,19 @@ import 'dart:convert';
 import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/form_elements/social_media_links.dart';
 import 'package:bearlysocial/components/texts/warning_message.dart';
+import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
+import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/native_lang_name.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:bearlysocial/providers/form_fields/first_name_focus_state.dart';
-import 'package:bearlysocial/providers/form_fields/interest_collection_state.dart';
-import 'package:bearlysocial/providers/form_fields/lang_collection_state.dart';
+import 'package:bearlysocial/providers/form_fields/foci_pod.dart';
+import 'package:bearlysocial/providers/form_fields/selections_pod.dart';
+import 'package:bearlysocial/providers/form_fields/langs_pod.dart';
 import 'package:bearlysocial/providers/form_fields/last_name_focus_state.dart';
-import 'package:bearlysocial/providers/form_fields/profile_pic_loading_state.dart';
-import 'package:bearlysocial/providers/form_fields/profile_pic_state.dart';
+import 'package:bearlysocial/providers/form_fields/flags_pod.dart';
+import 'package:bearlysocial/providers/form_fields/profile_pic_pod.dart';
 import 'package:bearlysocial/providers/form_fields/profile_save_state.dart';
 import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
@@ -72,6 +74,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
 
+  void _trackProfileChanges(List<TextEditingController> controllers) {
+    for (var c in controllers) {
+      // TODO: Improve the 'changes not saved' message handling here.
+      c.addListener(() => ref.read(setProfileSaveState)(isProfileSaved: false));
+    }
+  }
+
   void _syncWithDatabase() async {
     ref.read(setProfilePicLoadingState)(
       isProfilePicBeingLoaded: true,
@@ -83,8 +92,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: db_key.base_64_profile_pic.name,
     );
     if (base64ProfilePic.isNotEmpty) {
-      ref.read(setProfilePic)(
-        pic: img_lib.decodeImage(base64Decode(base64ProfilePic)),
+      ref.read(setProfilePicState)(
+        picState: img_lib.decodeImage(base64Decode(base64ProfilePic)),
       );
     }
 
@@ -95,14 +104,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: db_key.last_name.name,
     );
 
-    ref.read(setInterestCollection)(
-      collection: jsonDecode(local_db.retrieveTransaction(
-        key: db_key.interest_coll_code.name,
+    ref.read(setInterestSelectState)(
+      selectState: jsonDecode(local_db.retrieveTransaction(
+        key: db_key.interest_select_code.name,
       )).cast<String>(),
     );
-    ref.read(setLangCollection)(
-      collection: jsonDecode(local_db.retrieveTransaction(
-        key: db_key.lang_coll_code.name,
+    ref.read(setLangSelectState)(
+      selectState: jsonDecode(local_db.retrieveTransaction(
+        key: db_key.lang_select_code.name,
       )).cast<String>(),
     );
 
@@ -119,7 +128,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: db_key.linkedin_handle.name,
     );
 
-    ref.read(setSchedule)(
+    ref.read(setScheduleState)(
       timeSlots: SplayTreeMap.from(jsonDecode(
         local_db.retrieveTransaction(key: db_key.schedule.name),
       )),
@@ -136,40 +145,36 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   void _addInterest() {
     if (FormUtility.allInterests.containsKey(_interestController.text)) {
-      if (ref.read(interestCollection).length >= 4) {
-        ref.read(removeFirstLabelFromInterestCollection)();
+      if (ref.read(interestSelectState).length >= 4) {
+        ref.read(rmvFirstLabelFromInterestSelectState)();
       }
 
-      ref.read(addLabelToInterestCollection)(
-        label: _interestController.text,
+      ref.read(addLabelToInterestSelectState)(
+        labelToAdd: _interestController.text,
       );
       _interestController.text = '';
 
-      ref.read(setProfileSaveState)(
-        isProfileSaved: false,
-      );
+      ref.read(setProfileSaveState)(isProfileSaved: false);
     }
   }
 
   void _addLang() {
     if (NativeLanguageName.map.containsKey(_langController.text)) {
-      if (ref.read(langCollection).length >= 4) {
-        ref.read(removeFirstLabelFromLangCollection)();
+      if (ref.read(langSelectState).length >= 4) {
+        ref.read(rmvFirstLabelFromLangSelectState)();
       }
 
-      ref.read(addLabelToLangCollection)(
-        label: _langController.text,
+      ref.read(addLabelToLangSelectState)(
+        labelToAdd: _langController.text,
       );
       _langController.text = '';
 
-      ref.read(setProfileSaveState)(
-        isProfileSaved: false,
-      );
+      ref.read(setProfileSaveState)(isProfileSaved: false);
     }
   }
 
   void _removeInterest({required String labelToRemove}) {
-    ref.read(removeLabelFromInterestCollection)(
+    ref.read(rmvLabelFromInterestSelectState)(
       labelToRemove: labelToRemove,
     );
 
@@ -179,7 +184,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   void _removeLang({required String labelToRemove}) {
-    ref.read(removeLabelFromLangCollection)(
+    ref.read(rmvLabelFromLangSelectState)(
       labelToRemove: labelToRemove,
     );
 
@@ -200,22 +205,51 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  void _addListenersToControllers(List<TextEditingController> controllers) {
-    for (final controller in controllers) {
-      controller.addListener(() {
-        ref.read(setProfileSaveState)(isProfileSaved: false);
-      });
-    }
+  void _navToSelfieScreen() {
+    _getFrontCam().then((frontCamera) {
+      if (frontCamera != null) {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (_, p, q) => SelfieScreen(
+              frontCamera: frontCamera,
+              onPictureSuccess: ({
+                required img_lib.Image? profilePic,
+              }) {
+                // TODO: check if all is smooth
+                ref.read(setProfilePicLoadingState)(
+                  isProfilePicBeingLoaded: true,
+                );
+                ref.read(setProfilePicState)(
+                  picState: profilePic,
+                );
+                ref.read(setProfilePicLoadingState)(
+                  isProfilePicBeingLoaded: false,
+                );
+
+                ref.read(setProfileSaveState)(
+                  isProfileSaved: false,
+                );
+              },
+            ),
+            transitionDuration: const Duration(
+              seconds: AnimationDuration.instant,
+            ),
+          ),
+        );
+      }
+    });
   }
 
   void _apply() {
-    if (ref.read(profilePic) != null) {
-      DigitalOceanSpacesAPI.uploadProfilePic(
-        profilePic: ref.read(profilePic) as img_lib.Image,
-        uid: local_db.retrieveTransaction(
-          key: db_key.id.name,
-        ),
-      );
+    if (ref.read(profilePicState) != null) {
+      // CloudUtility.sendRequest(
+      //   endpoint: DigitalOceanDropletAPI.updateProfile,
+      //   method: HTTPmethod.,
+      //   body: ,
+      //   image: ,
+      //   onSuccess: ,
+      //   onBadRequest: ,
+      // );
     }
   }
 
@@ -223,7 +257,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void initState() {
     super.initState();
 
-    _addListenersToControllers([
+    _trackProfileChanges([
       _firstNameController,
       _lastNameController,
       _interestController,
@@ -276,43 +310,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.small,
               ),
+              // Profile Picture Update Button
               UnconstrainedBox(
                 child: SplashButton(
                   horizontalPadding: PaddingSize.small,
                   verticalPadding: PaddingSize.verySmall,
-                  callbackFunction: () {
-                    _getFrontCam().then((frontCamera) {
-                      if (frontCamera != null) {
-                        Navigator.of(context).push(
-                          PageRouteBuilder(
-                            pageBuilder: (_, p, q) => SelfieScreen(
-                              frontCamera: frontCamera,
-                              onPictureSuccess: ({
-                                required img_lib.Image? profilePic,
-                              }) {
-                                ref.read(setProfilePicLoadingState)(
-                                  isProfilePicBeingLoaded: true,
-                                );
-                                ref.read(setProfilePic)(
-                                  pic: profilePic,
-                                );
-                                ref.read(setProfilePicLoadingState)(
-                                  isProfilePicBeingLoaded: false,
-                                );
-
-                                ref.read(setProfileSaveState)(
-                                  isProfileSaved: false,
-                                );
-                              },
-                            ),
-                            transitionDuration: const Duration(
-                              seconds: AnimationDuration.instant,
-                            ),
-                          ),
-                        );
-                      }
-                    });
-                  },
+                  callbackFunction: _navToSelfieScreen,
                   buttonColor: Theme.of(context).highlightColor,
                   borderColor: Theme.of(context).focusColor,
                   borderRadius: BorderRadius.circular(
@@ -329,7 +332,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.medium,
               ),
-              FirstName(
+              FirstNameTextField(
                 controller: _firstNameController,
                 focusNode: _firstNameFocusNode,
               ),
@@ -343,7 +346,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.large,
               ),
-              InterestCollection(
+              InterestSelectionBoard(
                 controller: _interestController,
                 addLabel: _addInterest,
                 removeLabel: _removeInterest,

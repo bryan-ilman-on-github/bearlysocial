@@ -8,7 +8,7 @@ class ScheduleStateNotifier extends StateNotifier<SplayTreeMap> {
 
   final fullDateTimeFormat = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
 
-  void setSchedule({required SplayTreeMap timeSlots}) {
+  void setScheduleState({required SplayTreeMap timeSlots}) {
     state = SplayTreeMap.from(timeSlots);
   }
 
@@ -116,19 +116,19 @@ final scheduleStateNotifierProvider =
   (ref) => ScheduleStateNotifier(),
 );
 
-final schedule = Provider((ref) {
+final scheduleState = Provider((ref) {
   return ref.watch(scheduleStateNotifierProvider);
 });
 
-final setSchedule = Provider((ref) {
-  return ref.read(scheduleStateNotifierProvider.notifier).setSchedule;
+final setScheduleState = Provider((ref) {
+  return ref.read(scheduleStateNotifierProvider.notifier).setScheduleState;
 });
 
-final addTimeSlotCollection = Provider((ref) {
+final addTimeSlotColl = Provider((ref) {
   return ref.read(scheduleStateNotifierProvider.notifier).addTimeSlotCollection;
 });
 
-final updateTimeSlotCollection = Provider((ref) {
+final updateTimeSlotColl = Provider((ref) {
   return ref
       .read(scheduleStateNotifierProvider.notifier)
       .updateTimeSlotCollection;

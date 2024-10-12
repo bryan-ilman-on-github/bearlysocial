@@ -1,6 +1,6 @@
 import 'package:bearlysocial/components/form_elements/dropdown.dart';
 import 'package:bearlysocial/constants/native_lang_name.dart';
-import 'package:bearlysocial/providers/form_fields/lang_collection_state.dart';
+import 'package:bearlysocial/providers/form_fields/langs_pod.dart';
 import 'package:bearlysocial/utils/dropdown_operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

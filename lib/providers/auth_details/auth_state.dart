@@ -61,7 +61,7 @@ final authenticationStateNotifierProvider =
   (ref) => AuthenticationStateNotifier(),
 );
 
-final auth = Provider((ref) {
+final appAuth = Provider((ref) {
   return ref.watch(authenticationStateNotifierProvider);
 });
 

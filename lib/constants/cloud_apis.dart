@@ -30,4 +30,5 @@ class DigitalOceanDropletAPI {
   static const String deleteAccount = '$_basePath/delete-account';
   static const String requestOTP = '$_basePath/request-otp';
   static const String validateOTP = '$_basePath/validate-otp';
+  static const String updateProfile = '$_basePath/update-profile';
 }

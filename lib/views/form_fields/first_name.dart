@@ -1,5 +1,5 @@
 import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
-import 'package:bearlysocial/providers/form_fields/first_name_focus_state.dart';
+import 'package:bearlysocial/providers/form_fields/foci_pod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

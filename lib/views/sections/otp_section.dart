@@ -5,7 +5,6 @@ import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
-import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
 import 'package:bearlysocial/providers/auth_details/auth_state.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
