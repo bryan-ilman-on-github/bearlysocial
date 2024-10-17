@@ -1,4 +1,4 @@
-import 'package:bearlysocial/components/lines/progress_spinner.dart';
+import 'package:bearlysocial/views/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/form_fields/flags_pod.dart';
 import 'package:bearlysocial/providers/form_fields/profile_pic_pod.dart';

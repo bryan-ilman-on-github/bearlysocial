@@ -1,7 +1,7 @@
 import 'dart:collection';
 
-import 'package:bearlysocial/components/buttons/splash_btn.dart';
-import 'package:bearlysocial/components/pictures/profile_pic.dart' as reusables;
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/pictures/profile_pic.dart' as reusables;
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
 import 'package:bearlysocial/utils/form_util.dart';

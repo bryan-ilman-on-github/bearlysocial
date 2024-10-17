@@ -4,9 +4,11 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:bearlysocial/components/buttons/splash_btn.dart';
-import 'package:bearlysocial/components/form_elements/social_media_links.dart';
-import 'package:bearlysocial/components/texts/warning_message.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/form_elems/selector.dart';
+import 'package:bearlysocial/views/form_elems/social_media_links.dart';
+import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
+import 'package:bearlysocial/views/texts/warning_message.dart';
 import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
@@ -24,12 +26,8 @@ import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/form_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/user_permission_util.dart';
-import 'package:bearlysocial/views/form_fields/first_name_txt_field.dart';
-import 'package:bearlysocial/views/form_fields/interest_picker.dart';
-import 'package:bearlysocial/views/form_fields/lang_picker.dart';
-import 'package:bearlysocial/views/form_fields/last_name_txt_field.dart';
-import 'package:bearlysocial/views/form_fields/profile_pic_canvas.dart';
-import 'package:bearlysocial/views/form_fields/schedule.dart';
+import 'package:bearlysocial/views/form_elems/profile_pic_canvas.dart';
+import 'package:bearlysocial/views/form_elems/schedule.dart';
 import 'package:bearlysocial/views/screens/selfie_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -153,13 +151,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  void _removeInterest(String item) {
-    ref.read(removeInterest)(item);
+  void _removeInterest(String entry) {
+    ref.read(removeInterest)(entry);
     ref.read(setProfileSaveFlag)(false);
   }
 
-  void _removeLang(String item) {
-    ref.read(removeLang)(item);
+  void _removeLang(String entry) {
+    ref.read(removeLang)(entry);
     ref.read(setProfileSaveFlag)(false);
   }
 
@@ -290,32 +288,44 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.medium,
               ),
-              FirstNameTextField(
+              UnderlinedTextField(
+                label: 'First Name',
                 controller: _firstNameController,
                 focusNode: _firstNameFocusNode,
+                focusPod: firstNameFocus,
               ),
               const SizedBox(
                 height: WhiteSpaceSize.medium,
               ),
-              LastNameTextField(
+              UnderlinedTextField(
+                label: 'Last Name',
                 controller: _lastNameController,
                 focusNode: _lastNameFocusNode,
+                focusPod: lastNameFocus,
               ),
               const SizedBox(
                 height: WhiteSpaceSize.large,
               ),
-              InterestPicker(
+              Selector(
+                hint: 'Interest(s)',
+                menu: FormUtility.buildDropdownMenu(entries: _allInterests),
                 controller: _interestController,
-                addLabel: _addInterest,
-                removeLabel: _removeInterest,
+                entries: ref.watch(interests),
+                addEntry: _addInterest,
+                removeEntry: _removeInterest,
               ),
               const SizedBox(
                 height: WhiteSpaceSize.large,
               ),
-              LanguagePicker(
+              Selector(
+                hint: 'Language(s)',
+                menu: FormUtility.buildDropdownMenu(
+                  entries: NativeLanguageName.map,
+                ),
                 controller: _langController,
-                addLabel: _addLang,
-                removeLabel: _removeLang,
+                entries: ref.watch(langs),
+                addEntry: _addLang,
+                removeEntry: _removeLang,
               ),
               const SizedBox(
                 height: WhiteSpaceSize.medium,

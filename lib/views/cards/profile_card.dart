@@ -1,6 +1,6 @@
-import 'package:bearlysocial/components/buttons/splash_btn.dart';
-import 'package:bearlysocial/components/texts/decorated_txt.dart';
-import 'package:bearlysocial/components/pictures/profile_pic.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/texts/decorated_txt.dart';
+import 'package:bearlysocial/views/pictures/profile_pic.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/utils/form_util.dart';
 import 'package:flutter/material.dart';

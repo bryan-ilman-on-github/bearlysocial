@@ -1,6 +1,6 @@
-import 'package:bearlysocial/components/buttons/splash_btn.dart';
-import 'package:bearlysocial/components/form_elements/underlined_txt_field.dart';
-import 'package:bearlysocial/components/lines/progress_spinner.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
+import 'package:bearlysocial/views/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';

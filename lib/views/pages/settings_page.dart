@@ -1,5 +1,5 @@
-import 'package:bearlysocial/components/buttons/setting_btn.dart';
-import 'package:bearlysocial/components/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/buttons/setting_btn.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/providers/auth_details/auth_state.dart';

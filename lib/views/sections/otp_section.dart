@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bearlysocial/components/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';

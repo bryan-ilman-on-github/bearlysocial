@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:bearlysocial/components/buttons/splash_btn.dart';
-import 'package:bearlysocial/components/texts/animated_elliptical_txt.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/texts/animated_elliptical_txt.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/utils/fs_util.dart';
 import 'package:bearlysocial/utils/selfie_util.dart';
@@ -14,7 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
 
-part 'package:bearlysocial/components/lines/camera_frame.dart';
+part 'package:bearlysocial/views/lines/camera_frame.dart';
 
 class SelfieScreen extends ConsumerStatefulWidget {
   final CameraDescription frontCamera;

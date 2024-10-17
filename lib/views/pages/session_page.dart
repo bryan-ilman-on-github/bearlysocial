@@ -1,4 +1,4 @@
-import 'package:bearlysocial/components/bars/nav_bar.dart' as app_nav_bar;
+import 'package:bearlysocial/views/bars/nav_bar.dart' as app_nav_bar;
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/views/pages/explore_page.dart';
 import 'package:bearlysocial/views/pages/favorites_page.dart';

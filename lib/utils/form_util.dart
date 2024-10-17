@@ -1,4 +1,4 @@
-import 'package:bearlysocial/components/form_elements/tag.dart';
+import 'package:bearlysocial/views/form_elems/tag.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -118,20 +118,20 @@ class FormUtility {
     return menu;
   }
 
-  /// Builds a list of tags from a given collection of strings.
+  /// Builds a list of tags from a given list of strings.
   ///
-  /// The `collection` parameter represents the list of strings to convert into tags.
+  /// The `labels` parameter represents the list of strings to convert into tags.
   ///
   /// The `callbackFunction` parameter is the function invoked when the tag is interacted with.
   ///
-  /// Returns a list of `Tag` objects, each created with a label from the `collection` and linked to the provided `callbackFunction`.
+  /// Returns a list of `Tag` objects, each created with a label from the `labels` and linked to the provided `callbackFunction`.
   static List<Tag> buildTags({
-    required List<String> collection,
+    required List<String> labels,
     required Function callbackFunction,
   }) {
     List<Tag> tags = [];
 
-    for (var label in collection) {
+    for (var label in labels) {
       tags.add(Tag(label: label, callbackFunction: callbackFunction));
     }
 
