@@ -5,7 +5,7 @@ import 'package:bearlysocial/components/buttons/splash_btn.dart';
 import 'package:bearlysocial/components/texts/animated_elliptical_txt.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/utils/fs_util.dart';
-import 'package:bearlysocial/utils/selfie_capture_utils.dart';
+import 'package:bearlysocial/utils/selfie_util.dart';
 import 'package:camera/camera.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +18,12 @@ part 'package:bearlysocial/components/lines/camera_frame.dart';
 
 class SelfieScreen extends ConsumerStatefulWidget {
   final CameraDescription frontCamera;
-  final Function({required img_lib.Image? profilePic}) onPictureSuccess;
+  final Function(img_lib.Image?) onSuccess;
 
   const SelfieScreen({
     super.key,
     required this.frontCamera,
-    required this.onPictureSuccess,
+    required this.onSuccess,
   });
 
   @override
@@ -58,7 +58,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
 
   void _calculateCameraFrameCancelButtonPosition() {
     final screenSize = MediaQuery.of(context).size;
-    final frameSize = SelfieCaptureOperation.calculateCameraFrameSize(
+    final frameSize = SelfieUtility.calculateCameraFrameSize(
       screenSize: screenSize,
     );
 
@@ -121,7 +121,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
         if (!_detecting) {
           _detecting = true;
 
-          final Face? nowDetectedFace = await SelfieCaptureOperation.detectFace(
+          final Face? nowDetectedFace = await SelfieUtility.detectFace(
             screenSize: screenSize,
             image: img,
             sensorOrientation: widget.frontCamera.sensorOrientation,
@@ -168,12 +168,12 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
             );
 
             final img_lib.Image? profilePic =
-                await SelfieCaptureOperation.buildProfilePic(
+                await SelfieUtility.buildProfilePic(
               imagePath: renamedFilePath,
               screenSize: screenSize,
             );
 
-            widget.onPictureSuccess(profilePic: profilePic);
+            widget.onSuccess(profilePic);
           }
 
           setState(() {

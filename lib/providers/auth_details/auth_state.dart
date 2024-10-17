@@ -4,12 +4,10 @@ import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AuthenticationStateNotifier extends StateNotifier<bool> {
-  AuthenticationStateNotifier() : super(false);
+class _AuthNotifier extends StateNotifier<bool> {
+  _AuthNotifier() : super(false);
 
-  void enterApp() {
-    state = true;
-  }
+  void enterApp() => state = true;
 
   void exitApp() {
     LocalDatabaseUtility.emptyDatabase();
@@ -56,23 +54,13 @@ class AuthenticationStateNotifier extends StateNotifier<bool> {
   }
 }
 
-final authenticationStateNotifierProvider =
-    StateNotifierProvider<AuthenticationStateNotifier, bool>(
-  (ref) => AuthenticationStateNotifier(),
-);
+final _pod =
+    StateNotifierProvider<_AuthNotifier, bool>((ref) => _AuthNotifier());
 
-final appAuth = Provider((ref) {
-  return ref.watch(authenticationStateNotifierProvider);
-});
+final appAuth = Provider((ref) => ref.watch(_pod));
 
-final enterApp = Provider((ref) {
-  return ref.read(authenticationStateNotifierProvider.notifier).enterApp;
-});
+final enterApp = Provider((ref) => ref.read(_pod.notifier).enterApp);
 
-final exitApp = Provider((ref) {
-  return ref.read(authenticationStateNotifierProvider.notifier).exitApp;
-});
+final exitApp = Provider((ref) => ref.read(_pod.notifier).exitApp);
 
-final deleteAccount = Provider((ref) {
-  return ref.read(authenticationStateNotifierProvider.notifier).deleteAccount;
-});
+final deleteAccount = Provider((ref) => ref.read(_pod.notifier).deleteAccount);

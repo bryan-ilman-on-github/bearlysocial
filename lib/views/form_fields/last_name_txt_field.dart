@@ -3,11 +3,11 @@ import 'package:bearlysocial/providers/form_fields/foci_pod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FirstNameTextField extends ConsumerWidget {
+class LastNameTextField extends ConsumerWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
 
-  const FirstName({
+  const LastNameTextField({
     super.key,
     required this.controller,
     required this.focusNode,
@@ -15,10 +15,10 @@ class FirstNameTextField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, var ref) {
-    ref.watch(firstNameFocusState);
+    ref.watch(lastNameFocus);
 
     return UnderlinedTextField(
-      label: 'First Name',
+      label: 'Last Name',
       controller: controller,
       focusNode: focusNode,
     );

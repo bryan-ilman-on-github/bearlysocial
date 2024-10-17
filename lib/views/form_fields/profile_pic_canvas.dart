@@ -2,12 +2,12 @@ import 'package:bearlysocial/components/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/form_fields/flags_pod.dart';
 import 'package:bearlysocial/providers/form_fields/profile_pic_pod.dart';
-import 'package:bearlysocial/utils/selfie_capture_utils.dart';
+import 'package:bearlysocial/utils/selfie_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfilePicture extends ConsumerWidget {
-  const ProfilePicture({super.key});
+class ProfilePictureCanvas extends ConsumerWidget {
+  const ProfilePictureCanvas({super.key});
 
   @override
   Widget build(BuildContext context, var ref) {
@@ -16,7 +16,7 @@ class ProfilePicture extends ConsumerWidget {
       height: SideSize.large,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: ref.read(profilePicLoadingState) || ref.read(profilePic) == null
+        border: ref.read(isLoadingProfilePic) || ref.read(profilePic) == null
             ? Border.all(
                 width: ThicknessSize.medium,
                 color: Theme.of(context).dividerColor,
@@ -24,11 +24,9 @@ class ProfilePicture extends ConsumerWidget {
             : null,
       ),
       child: Center(
-        child: ref.watch(profilePicLoadingState)
+        child: ref.watch(isLoadingProfilePic)
             ? const ProgressSpinner()
-            : SelfieCaptureOperation.buildProfilePictureCanvas(
-                profilePic: ref.read(profilePic),
-              ),
+            : SelfieUtility.buildCircularImage(ref.read(profilePic)),
       ),
     );
   }

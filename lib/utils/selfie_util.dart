@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
 
-class SelfieCaptureUtility {
-  static double calculateCameraFrameSize({
+class SelfieUtility {
+  static double calculateCamFrameSize({
     required Size screenSize,
   }) {
     var frameSize = (screenSize.width < screenSize.height)
@@ -25,9 +25,7 @@ class SelfieCaptureUtility {
     required CameraImage image,
     required FaceDetector faceDetector,
   }) async {
-    final Uint8List completeBytes = extractBytes(
-      image: image,
-    );
+    final Uint8List completeBytes = extractBytes(image: image);
     final InputImageMetadata imgMetadata = buildImageMetadata(
       image: image,
       sensorOrientation: sensorOrientation,
@@ -187,7 +185,7 @@ class SelfieCaptureUtility {
         height: newHeight,
       );
 
-      final int size = calculateCameraFrameSize(screenSize: screenSize).toInt();
+      final int size = calculateCamFrameSize(screenSize: screenSize).toInt();
       final int offsetX = (stretchedImage.width - size) ~/ 2;
       final int offsetY = (stretchedImage.height - size) ~/ 2;
 
@@ -210,17 +208,15 @@ class SelfieCaptureUtility {
     }
   }
 
-  static Widget buildProfilePictureCanvas({
-    required img_lib.Image? profilePic,
-  }) {
-    if (profilePic == null) {
+  static Widget buildCircularImage(img_lib.Image? img) {
+    if (img == null) {
       return const Icon(
         Icons.no_photography_outlined,
       );
     } else {
       return ClipOval(
         child: Image.memory(Uint8List.fromList(
-          img_lib.encodePng(profilePic),
+          img_lib.encodePng(img),
         )),
       );
     }

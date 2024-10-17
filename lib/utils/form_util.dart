@@ -82,30 +82,21 @@ class FormUtility {
       endInitialDate: DateTime.now().add(const Duration(minutes: 20)),
       startFirstDate: DateTime.now(),
       endFirstDate: DateTime.now(),
-      startLastDate: DateTime.now().add(const Duration(days: 30)),
-      endLastDate: DateTime.now().add(const Duration(days: 30)),
+      startLastDate: DateTime.now().add(const Duration(days: 14)),
+      endLastDate: DateTime.now().add(const Duration(days: 14)),
       minutesInterval: 5,
       borderRadius: const BorderRadius.all(Radius.circular(
         CurvatureSize.large,
       )),
-      constraints: const BoxConstraints(
-        maxWidth: 350,
-        maxHeight: 650,
-      ),
+      constraints: const BoxConstraints(maxWidth: 350, maxHeight: 650),
       transitionBuilder: (_, animA, animB, child) {
         return FadeTransition(
-          opacity: animA.drive(
-            Tween(
-              begin: 0.0,
-              end: 1.0,
-            ),
-          ),
+          opacity: animA.drive(Tween(begin: 0.0, end: 1.0)),
           child: child,
         );
       },
-      transitionDuration: const Duration(
-        milliseconds: AnimationDuration.medium,
-      ),
+      transitionDuration:
+          const Duration(milliseconds: AnimationDuration.medium),
       barrierDismissible: true,
     );
   }
@@ -141,9 +132,7 @@ class FormUtility {
     List<Tag> tags = [];
 
     for (var label in collection) {
-      tags.add(
-        Tag(label: label, callbackFunction: callbackFunction),
-      );
+      tags.add(Tag(label: label, callbackFunction: callbackFunction));
     }
 
     return tags;

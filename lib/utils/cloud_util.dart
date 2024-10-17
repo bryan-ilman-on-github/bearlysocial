@@ -36,7 +36,9 @@ class CloudUtility {
     required Function onBadRequest,
   }) async {
     var url = URI.parse(endpoint);
+
     String token = 'your-token-from-database'; // TODO: from local storage
+
     http.BaseRequest request;
 
     if (method == 'POST' || method == 'PUT') {
@@ -69,9 +71,9 @@ class CloudUtility {
     } else if (response.statusCode == StatusCode.BAD_REQUEST) {
       onBadRequest(response);
     } else if (response.statusCode == StatusCode.UNAUTHORIZED) {
-      // TODO: Log the user out of the app
+      // TODO: Log the user out of the app.
     } else {
-      // TODO: Display a full-screen modal indicating an internal server error
+      // TODO: Display a full-screen modal indicating an internal server error.
     }
   }
 

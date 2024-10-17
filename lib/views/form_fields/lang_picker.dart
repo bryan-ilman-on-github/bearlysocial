@@ -1,16 +1,14 @@
 import 'package:bearlysocial/components/form_elements/dropdown.dart';
 import 'package:bearlysocial/constants/native_lang_name.dart';
-import 'package:bearlysocial/providers/form_fields/langs_pod.dart';
-import 'package:bearlysocial/utils/dropdown_operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LanguageCollection extends ConsumerWidget {
+class LanguagePicker extends ConsumerWidget {
   final TextEditingController controller;
   final void Function() addLabel;
   final void Function({required String labelToRemove}) removeLabel;
 
-  const LanguageCollection({
+  const LanguagePicker({
     super.key,
     required this.controller,
     required this.addLabel,

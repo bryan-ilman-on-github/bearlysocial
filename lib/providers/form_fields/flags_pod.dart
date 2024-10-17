@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class _FlagNotifier extends StateNotifier<bool> {
-  _FlagNotifier(bool initVal) : super(initVal);
+  _FlagNotifier(bool initFlag) : super(initFlag);
 
-  void setState(bool newVal) => state = newVal;
+  void setState(bool activeFlag) => state = activeFlag;
 }
 
 final _profileSaveFlagPod = StateNotifierProvider<_FlagNotifier, bool>(
@@ -13,11 +13,12 @@ final _profilePicLoadingFlagPod = StateNotifierProvider<_FlagNotifier, bool>(
   (ref) => _FlagNotifier(false),
 );
 
-final isProfileSaved = Provider((ref) => ref.watch(_profileSaveFlagPod));
+final isProfileSaved = //
+    Provider((ref) => ref.watch(_profileSaveFlagPod));
 final isLoadingProfilePic =
     Provider((ref) => ref.watch(_profilePicLoadingFlagPod));
 
 final setProfileSaveFlag =
     Provider((ref) => ref.read(_profileSaveFlagPod.notifier).setState);
-final setProfilePicLoadingFlag =
+final setLoadingProfilePicFlag =
     Provider((ref) => ref.read(_profilePicLoadingFlagPod.notifier).setState);

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:bearlysocial/components/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
-import 'package:bearlysocial/utils/selfie_capture_utils.dart';
+import 'package:bearlysocial/utils/selfie_util.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img_lib;
 

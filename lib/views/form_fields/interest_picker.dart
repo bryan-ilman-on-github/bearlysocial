@@ -1,19 +1,19 @@
 import 'package:bearlysocial/components/form_elements/dropdown.dart';
 import 'package:bearlysocial/providers/form_fields/selections_pod.dart';
-import 'package:bearlysocial/utils/dropdown_operation.dart';
+import 'package:bearlysocial/utils/form_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class InterestCollection extends ConsumerWidget {
+class InterestPicker extends ConsumerWidget {
   final TextEditingController controller;
   final void Function() addLabel;
-  final void Function({required String labelToRemove}) removeLabel;
+  final void Function(String item) removeInterest;
 
-  const InterestCollectionDropdown({
+  const InterestPicker({
     super.key,
     required this.controller,
     required this.addLabel,
-    required this.removeLabel,
+    required this.removeInterest,
   });
 
   @override
@@ -21,12 +21,12 @@ class InterestCollection extends ConsumerWidget {
     return Dropdown(
       hint: 'Interest(s)',
       controller: controller,
-      menu: DropdownOperation.buildMenu(
-        entries: DropdownOperation.allInterests,
+      menu: FormUtility.buildDropdownMenu(
+        entries: FormUtility.allInterests,
       ),
-      collection: ref.watch(interestCollection),
+      collection: ref.watch(interests),
       addLabel: addLabel,
-      removeLabel: removeLabel,
+      removeLabel: removeInterest,
     );
   }
 }

@@ -14,23 +14,21 @@ import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/native_lang_name.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
+import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:bearlysocial/providers/form_fields/foci_pod.dart';
 import 'package:bearlysocial/providers/form_fields/selections_pod.dart';
-import 'package:bearlysocial/providers/form_fields/langs_pod.dart';
-import 'package:bearlysocial/providers/form_fields/last_name_focus_state.dart';
 import 'package:bearlysocial/providers/form_fields/flags_pod.dart';
 import 'package:bearlysocial/providers/form_fields/profile_pic_pod.dart';
-import 'package:bearlysocial/providers/form_fields/profile_save_state.dart';
 import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/form_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/user_permission_util.dart';
-import 'package:bearlysocial/views/form_fields/first_name.dart';
-import 'package:bearlysocial/views/form_fields/interest_coll.dart';
-import 'package:bearlysocial/views/form_fields/lang_coll.dart';
-import 'package:bearlysocial/views/form_fields/last_name.dart';
-import 'package:bearlysocial/views/form_fields/profile_pic.dart' as form_fields;
+import 'package:bearlysocial/views/form_fields/first_name_txt_field.dart';
+import 'package:bearlysocial/views/form_fields/interest_picker.dart';
+import 'package:bearlysocial/views/form_fields/lang_picker.dart';
+import 'package:bearlysocial/views/form_fields/last_name_txt_field.dart';
+import 'package:bearlysocial/views/form_fields/profile_pic_canvas.dart';
 import 'package:bearlysocial/views/form_fields/schedule.dart';
 import 'package:bearlysocial/views/screens/selfie_screen.dart';
 import 'package:camera/camera.dart';
@@ -41,6 +39,7 @@ import 'package:image/image.dart' as img_lib;
 
 typedef local_db = LocalDatabaseUtility;
 typedef db_key = DatabaseKey;
+typedef txt_sym = TextSymbol;
 
 class ProfilePage extends ConsumerStatefulWidget {
   final ScrollController controller;
@@ -77,24 +76,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _trackProfileChanges(List<TextEditingController> controllers) {
     for (var c in controllers) {
       // TODO: Improve the 'changes not saved' message handling here.
-      c.addListener(() => ref.read(setProfileSaveState)(isProfileSaved: false));
+      c.addListener(() => ref.read(setProfileSaveFlag)(false));
     }
   }
 
   void _syncWithDatabase() async {
-    ref.read(setProfilePicLoadingState)(
-      isProfilePicBeingLoaded: true,
-    );
+    ref.read(setLoadingProfilePicFlag)(true);
 
     await Future.delayed(Duration(seconds: 10)); // TODO: check this!
 
-    String base64ProfilePic = local_db.retrieveTransaction(
-      key: db_key.base_64_profile_pic.name,
-    );
-    if (base64ProfilePic.isNotEmpty) {
-      ref.read(setProfilePicState)(
-        picState: img_lib.decodeImage(base64Decode(base64ProfilePic)),
-      );
+    String bytes =
+        local_db.retrieveTransaction(key: db_key.base_64_profile_pic.name);
+
+    if (bytes.isNotEmpty) {
+      ref.read(setProfilePic)(img_lib.decodeImage(base64Decode(bytes)));
     }
 
     _firstNameController.text = local_db.retrieveTransaction(
@@ -104,19 +99,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: db_key.last_name.name,
     );
 
-    ref.read(setInterestSelectState)(
-      selectState: jsonDecode(local_db.retrieveTransaction(
-        key: db_key.interest_select_code.name,
-      )).cast<String>(),
+    ref.read(setInterests)(
+      jsonDecode(local_db.retrieveTransaction(key: db_key.interests_code.name))
+          .cast<String>(),
     );
-    ref.read(setLangSelectState)(
-      selectState: jsonDecode(local_db.retrieveTransaction(
-        key: db_key.lang_select_code.name,
-      )).cast<String>(),
+    ref.read(setLangs)(
+      jsonDecode(local_db.retrieveTransaction(key: db_key.langs_code.name))
+          .cast<String>(),
     );
 
-    _interestController.text = '';
-    _langController.text = '';
+    _interestController.text = txt_sym.emptyString;
+    _langController.text = txt_sym.emptyString;
 
     _instaLinkController.text = local_db.retrieveTransaction(
       key: db_key.insta_handle.name,
@@ -128,69 +121,46 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: db_key.linkedin_handle.name,
     );
 
-    ref.read(setScheduleState)(
-      timeSlots: SplayTreeMap.from(jsonDecode(
-        local_db.retrieveTransaction(key: db_key.schedule.name),
-      )),
-    );
+    ref.read(setSchedule)(SplayTreeMap.from(jsonDecode(
+      local_db.retrieveTransaction(key: db_key.schedule.name),
+    )));
 
-    ref.read(setProfilePicLoadingState)(
-      isProfilePicBeingLoaded: false,
-    );
-
-    ref.read(setProfileSaveState)(
-      isProfileSaved: true,
-    );
+    ref.read(setLoadingProfilePicFlag)(false);
+    ref.read(setProfileSaveFlag)(true);
   }
 
+  final _allInterests = FormUtility.allInterests;
+
   void _addInterest() {
-    if (FormUtility.allInterests.containsKey(_interestController.text)) {
-      if (ref.read(interestSelectState).length >= 4) {
-        ref.read(rmvFirstLabelFromInterestSelectState)();
-      }
+    if (_allInterests.containsKey(_interestController.text)) {
+      if (ref.read(interests).length >= 4) ref.read(removeFirstInterest)();
 
-      ref.read(addLabelToInterestSelectState)(
-        labelToAdd: _interestController.text,
-      );
-      _interestController.text = '';
+      ref.read(addInterest)(_interestController.text);
+      _interestController.text = txt_sym.emptyString;
 
-      ref.read(setProfileSaveState)(isProfileSaved: false);
+      ref.read(setProfileSaveFlag)(false);
     }
   }
 
   void _addLang() {
     if (NativeLanguageName.map.containsKey(_langController.text)) {
-      if (ref.read(langSelectState).length >= 4) {
-        ref.read(rmvFirstLabelFromLangSelectState)();
-      }
+      if (ref.read(langs).length >= 4) ref.read(removeFirstLang)();
 
-      ref.read(addLabelToLangSelectState)(
-        labelToAdd: _langController.text,
-      );
-      _langController.text = '';
+      ref.read(addLang)(_langController.text);
+      _langController.text = txt_sym.emptyString;
 
-      ref.read(setProfileSaveState)(isProfileSaved: false);
+      ref.read(setProfileSaveFlag)(false);
     }
   }
 
-  void _removeInterest({required String labelToRemove}) {
-    ref.read(rmvLabelFromInterestSelectState)(
-      labelToRemove: labelToRemove,
-    );
-
-    ref.read(setProfileSaveState)(
-      isProfileSaved: false,
-    );
+  void _removeInterest(String item) {
+    ref.read(removeInterest)(item);
+    ref.read(setProfileSaveFlag)(false);
   }
 
-  void _removeLang({required String labelToRemove}) {
-    ref.read(rmvLabelFromLangSelectState)(
-      labelToRemove: labelToRemove,
-    );
-
-    ref.read(setProfileSaveState)(
-      isProfileSaved: false,
-    );
+  void _removeLang(String item) {
+    ref.read(removeLang)(item);
+    ref.read(setProfileSaveFlag)(false);
   }
 
   Future<CameraDescription?> _getFrontCam() async {
@@ -212,23 +182,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           PageRouteBuilder(
             pageBuilder: (_, p, q) => SelfieScreen(
               frontCamera: frontCamera,
-              onPictureSuccess: ({
-                required img_lib.Image? profilePic,
-              }) {
-                // TODO: check if all is smooth
-                ref.read(setProfilePicLoadingState)(
-                  isProfilePicBeingLoaded: true,
-                );
-                ref.read(setProfilePicState)(
-                  picState: profilePic,
-                );
-                ref.read(setProfilePicLoadingState)(
-                  isProfilePicBeingLoaded: false,
-                );
-
-                ref.read(setProfileSaveState)(
-                  isProfileSaved: false,
-                );
+              onSuccess: (img_lib.Image? img) {
+                // TODO: check if all is smooth.
+                ref.read(setLoadingProfilePicFlag)(true);
+                ref.read(setProfilePic)(img);
+                ref.read(setLoadingProfilePicFlag)(false);
+                ref.read(setProfileSaveFlag)(false);
               },
             ),
             transitionDuration: const Duration(
@@ -241,7 +200,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   void _apply() {
-    if (ref.read(profilePicState) != null) {
+    if (ref.read(profilePic) != null) {
       // CloudUtility.sendRequest(
       //   endpoint: DigitalOceanDropletAPI.updateProfile,
       //   method: HTTPmethod.,
@@ -268,10 +227,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ]);
 
     _firstNameFocusNode.addListener(() {
-      ref.read(toggleFirstNameFocusState)();
+      ref.read(toggleFirstNameFocus)();
     });
     _lastNameFocusNode.addListener(() {
-      ref.read(toggleLastNameFocusState)();
+      ref.read(toggleLastNameFocus)();
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -291,6 +250,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
+        // TODO: check if color is necessary.
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SingleChildScrollView(
           controller: widget.controller,
@@ -306,7 +266,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.verySmall,
               ),
-              const form_fields.ProfilePicture(),
+              const ProfilePictureCanvas(),
               const SizedBox(
                 height: WhiteSpaceSize.small,
               ),
@@ -318,9 +278,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   callbackFunction: _navToSelfieScreen,
                   buttonColor: Theme.of(context).highlightColor,
                   borderColor: Theme.of(context).focusColor,
-                  borderRadius: BorderRadius.circular(
-                    CurvatureSize.infinity,
-                  ),
+                  borderRadius: BorderRadius.circular(CurvatureSize.infinity),
                   child: Text(
                     'Update Profile Picture',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -339,14 +297,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.medium,
               ),
-              LastName(
+              LastNameTextField(
                 controller: _lastNameController,
                 focusNode: _lastNameFocusNode,
               ),
               const SizedBox(
                 height: WhiteSpaceSize.large,
               ),
-              InterestSelectionBoard(
+              InterestPicker(
                 controller: _interestController,
                 addLabel: _addInterest,
                 removeLabel: _removeInterest,
@@ -354,7 +312,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(
                 height: WhiteSpaceSize.large,
               ),
-              LanguageCollection(
+              LanguagePicker(
                 controller: _langController,
                 addLabel: _addLang,
                 removeLabel: _removeLang,
