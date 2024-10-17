@@ -63,9 +63,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   final _langController = TextEditingController();
 
   // Text controllers for social media links.
-  final _instaLinkController = TextEditingController();
-  final _facebookLinkController = TextEditingController();
-  final _linkedinLinkController = TextEditingController();
+  final _instaHandleController = TextEditingController();
+  final _facebookHandleController = TextEditingController();
+  final _linkedinHandleController = TextEditingController();
 
   // Focus nodes for managing text field focus.
   final _firstNameFocusNode = FocusNode();
@@ -109,13 +109,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     _interestController.text = txt_sym.emptyString;
     _langController.text = txt_sym.emptyString;
 
-    _instaLinkController.text = local_db.retrieveTransaction(
+    _instaHandleController.text = local_db.retrieveTransaction(
       key: db_key.insta_handle.name,
     );
-    _facebookLinkController.text = local_db.retrieveTransaction(
+    _facebookHandleController.text = local_db.retrieveTransaction(
       key: db_key.fb_handle.name,
     );
-    _linkedinLinkController.text = local_db.retrieveTransaction(
+    _linkedinHandleController.text = local_db.retrieveTransaction(
       key: db_key.linkedin_handle.name,
     );
 
@@ -219,9 +219,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       _lastNameController,
       _interestController,
       _langController,
-      _instaLinkController,
-      _facebookLinkController,
-      _linkedinLinkController,
+      _instaHandleController,
+      _facebookHandleController,
+      _linkedinHandleController,
     ]);
 
     _firstNameFocusNode.addListener(() {
@@ -261,13 +261,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 alignment: Alignment.centerLeft,
                 child: WarningMessage(),
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.verySmall,
-              ),
+              const SizedBox(height: WhiteSpaceSize.verySmall),
               const ProfilePictureCanvas(),
-              const SizedBox(
-                height: WhiteSpaceSize.small,
-              ),
+              const SizedBox(height: WhiteSpaceSize.small),
               // Profile Picture Update Button
               UnconstrainedBox(
                 child: SplashButton(
@@ -285,27 +281,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.medium,
-              ),
+              const SizedBox(height: WhiteSpaceSize.medium),
               UnderlinedTextField(
                 label: 'First Name',
                 controller: _firstNameController,
                 focusNode: _firstNameFocusNode,
                 focusPod: firstNameFocus,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.medium,
-              ),
+              const SizedBox(height: WhiteSpaceSize.medium),
               UnderlinedTextField(
                 label: 'Last Name',
                 controller: _lastNameController,
                 focusNode: _lastNameFocusNode,
                 focusPod: lastNameFocus,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.large,
-              ),
+              const SizedBox(height: WhiteSpaceSize.large),
               Selector(
                 hint: 'Interest(s)',
                 menu: FormUtility.buildDropdownMenu(entries: _allInterests),
@@ -314,9 +304,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 addEntry: _addInterest,
                 removeEntry: _removeInterest,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.large,
-              ),
+              const SizedBox(height: WhiteSpaceSize.large),
               Selector(
                 hint: 'Language(s)',
                 menu: FormUtility.buildDropdownMenu(
@@ -327,30 +315,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 addEntry: _addLang,
                 removeEntry: _removeLang,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.medium,
-              ),
+              const SizedBox(height: WhiteSpaceSize.medium),
               SocialMediaLink(
                 platform: SocialMedia.instagram,
-                controller: _instaLinkController,
+                controller: _instaHandleController,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.medium,
-              ),
+              const SizedBox(height: WhiteSpaceSize.medium),
               SocialMediaLink(
                 platform: SocialMedia.facebook,
-                controller: _facebookLinkController,
+                controller: _facebookHandleController,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.medium,
-              ),
+              const SizedBox(height: WhiteSpaceSize.medium),
               SocialMediaLink(
                 platform: SocialMedia.linkedin,
-                controller: _linkedinLinkController,
+                controller: _linkedinHandleController,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.large,
-              ),
+              const SizedBox(height: WhiteSpaceSize.large),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -358,9 +338,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.verySmall,
-              ),
+              const SizedBox(height: WhiteSpaceSize.verySmall),
               const Schedule(),
               Align(
                 alignment: Alignment.centerLeft,
@@ -392,9 +370,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.large,
-              ),
+              const SizedBox(height: WhiteSpaceSize.large),
               Padding(
                 padding: const EdgeInsets.only(
                   bottom: PaddingSize.medium,

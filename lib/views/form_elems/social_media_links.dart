@@ -1,29 +1,33 @@
+// ignore_for_file: camel_case_types
+
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
-import 'package:bearlysocial/utilities/local_db_servicesdart';
+import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+typedef local_db = LocalDatabaseUtility;
+
 class SocialMediaLink extends StatelessWidget {
+  final TextEditingController controller;
   final SocialMedia platform;
   final String? handle;
-  final TextEditingController controller;
 
   const SocialMediaLink({
     super.key,
-    required this.platform,
     required this.controller,
+    required this.platform,
     this.handle,
   });
 
   @override
   Widget build(BuildContext context) {
-    controller.text = handle ??
-        DatabaseOperation.retrieveTransaction(key: '${platform.name}_handle');
+    controller.text =
+        handle ?? local_db.retrieveTransaction(key: '${platform.name}_handle');
 
-    dynamic peerVerificationCount = DatabaseOperation.retrieveTransaction(
+    dynamic peerVerificationCount = local_db.retrieveTransaction(
       key: '${platform.name}_peer_verification_count',
     );
 
@@ -31,10 +35,10 @@ class SocialMediaLink extends StatelessWidget {
       peerVerificationCount = int.parse(peerVerificationCount);
     }
 
-    final TextStyle? linkStyle =
-        Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).focusColor,
-            );
+    final TextStyle? linkStyle = Theme.of(context)
+        .textTheme
+        .bodyMedium
+        ?.copyWith(color: Theme.of(context).focusColor);
 
     final Widget linkText = handle == null
         ? TextField(
@@ -43,15 +47,13 @@ class SocialMediaLink extends StatelessWidget {
             decoration: InputDecoration(
               isCollapsed: true,
               border: InputBorder.none,
-              hintText: 'Type your handle here.',
+              hintText: 'Type your username here.',
               hintStyle: linkStyle,
             ),
           )
         : Text(
             handle!.isEmpty ? '-' : handle as String,
-            style: TextStyle(
-              color: Theme.of(context).indicatorColor,
-            ),
+            style: TextStyle(color: Theme.of(context).indicatorColor),
           );
 
     final Widget platformIcon = SvgPicture.asset(
@@ -61,7 +63,7 @@ class SocialMediaLink extends StatelessWidget {
       color: Theme.of(context).focusColor,
     );
 
-    final Widget icon = controller.text.isNotEmpty
+    final Widget verficationIcon = controller.text.isNotEmpty
         ? SvgPicture.asset(
             peerVerificationCount <= 4
                 ? 'assets/svgs/warning_icon.svg'
@@ -80,11 +82,7 @@ class SocialMediaLink extends StatelessWidget {
             )
           : null,
       onLongPress: () => handle != null
-          ? Clipboard.setData(
-              ClipboardData(
-                text: platform.domain + handle!,
-              ),
-            )
+          ? Clipboard.setData(ClipboardData(text: platform.domain + handle!))
           : null,
       child: Column(
         children: [
@@ -98,7 +96,7 @@ class SocialMediaLink extends StatelessWidget {
                 Text(
                   controller.text.isNotEmpty
                       ? '$peerVerificationCount peer verification(s)'
-                      : '',
+                      : '', // TODO: check this!
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontStyle: FontStyle.italic,
                       ),
@@ -107,29 +105,21 @@ class SocialMediaLink extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(
-              PaddingSize.verySmall,
-            ),
+            padding: const EdgeInsets.all(PaddingSize.verySmall),
             decoration: BoxDecoration(
               color: Theme.of(context).highlightColor,
               border: Border.all(
                 color: Theme.of(context).focusColor,
                 width: ThicknessSize.medium,
               ),
-              borderRadius: BorderRadius.circular(
-                CurvatureSize.large,
-              ),
+              borderRadius: BorderRadius.circular(CurvatureSize.large),
             ),
             child: Row(
               children: [
                 platformIcon,
-                const SizedBox(
-                  width: WhiteSpaceSize.verySmall,
-                ),
-                Expanded(
-                  child: linkText,
-                ),
-                icon,
+                const SizedBox(width: WhiteSpaceSize.verySmall),
+                Expanded(child: linkText),
+                verficationIcon, // TODO: check this!
               ],
             ),
           ),
