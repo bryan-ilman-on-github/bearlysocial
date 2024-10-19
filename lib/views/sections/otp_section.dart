@@ -1,12 +1,12 @@
 import 'dart:convert';
 
+import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
-import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
-import 'package:bearlysocial/providers/auth_details/auth_state.dart';
+import 'package:bearlysocial/providers/txt_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
       endpoint: DigitalOceanDropletAPI.validateOTP,
       method: HTTPmethod.POST.name,
       body: {
-        'email_address': ref.read(authPageEmailAddr),
+        'email_address': ref.read(authEmailAddr),
         'otp': _otp.join(),
       },
       onSuccess: (response) async {
@@ -60,11 +60,8 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
           ),
         );
 
-        ref.read(enterApp)();
-
-        ref.read(setAuthPageEmailAddr)(
-          emailAddr: '',
-        );
+        ref.read(setAuthFlag)(true);
+        ref.read(setAuthEmailAddr)('');
       },
       onBadRequest: (response) {
         setState(() {
@@ -77,7 +74,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
   }
 
   void _goBack() {
-    ref.read(setAuthPageEmailAddr)(emailAddr: '');
+    ref.read(setAuthEmailAddr)('');
     _otpErrorText = '';
     _canInvokeCallback = true;
   }
@@ -95,13 +92,11 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
               ),
         ),
         Text(
-          "We've sent a one-time password (OTP) to ${ref.watch(authPageEmailAddr)}.",
+          "We've sent a one-time password (OTP) to ${ref.watch(authEmailAddr)}.",
           maxLines: 4,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
-        const SizedBox(
-          height: WhiteSpaceSize.medium,
-        ),
+        const SizedBox(height: WhiteSpaceSize.medium),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: _otp.asMap().entries.map((entry) {
@@ -139,27 +134,21 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.zero,
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      CurvatureSize.large,
-                    ),
+                    borderRadius: BorderRadius.circular(CurvatureSize.large),
                     borderSide: BorderSide(
                       width: ThicknessSize.small,
                       color: Theme.of(context).dividerColor,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      CurvatureSize.large,
-                    ),
+                    borderRadius: BorderRadius.circular(CurvatureSize.large),
                     borderSide: BorderSide(
                       width: ThicknessSize.medium,
                       color: Theme.of(context).focusColor,
                     ),
                   ),
                   disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      CurvatureSize.large,
-                    ),
+                    borderRadius: BorderRadius.circular(CurvatureSize.large),
                     borderSide: BorderSide(
                       width: ThicknessSize.small,
                       color: Theme.of(context).highlightColor,
@@ -170,9 +159,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
             );
           }).toList(),
         ),
-        const SizedBox(
-          height: WhiteSpaceSize.verySmall,
-        ),
+        const SizedBox(height: WhiteSpaceSize.verySmall),
         _canInvokeCallback
             ? Text(
                 _otpErrorText.isEmpty ? '\n' : _otpErrorText,
@@ -188,9 +175,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
                   color: Theme.of(context).focusColor,
                 ),
               ),
-        const SizedBox(
-          height: WhiteSpaceSize.veryLarge,
-        ),
+        const SizedBox(height: WhiteSpaceSize.veryLarge),
         Row(
           children: [
             SplashButton(
@@ -199,19 +184,13 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
               buttonColor: Theme.of(context).scaffoldBackgroundColor,
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.arrow_back,
-                  ),
-                  const SizedBox(
-                    width: WhiteSpaceSize.verySmall,
-                  ),
+                  const Icon(Icons.arrow_back),
+                  const SizedBox(width: WhiteSpaceSize.verySmall),
                   Text(
                     'Go Back',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(
-                    width: MarginSize.small,
-                  ),
+                  const SizedBox(width: MarginSize.small),
                 ],
               ),
             ),

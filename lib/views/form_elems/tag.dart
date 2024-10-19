@@ -3,35 +3,26 @@ import 'package:flutter/material.dart';
 
 class Tag extends StatelessWidget {
   final String label;
-  final Function callbackFunction;
+  final Function removeSelf;
 
-  /// [Tag] is a [StatelessWidget] representing a tag element.
   const Tag({
     super.key,
     required this.label,
-    required this.callbackFunction,
+    required this.removeSelf,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        callbackFunction(
-          labelToRemove: label,
-        );
-      },
+      onTap: removeSelf(), // TODO: check this.
       child: Container(
-        padding: const EdgeInsets.all(
-          PaddingSize.verySmall,
-        ),
+        padding: const EdgeInsets.all(PaddingSize.verySmall),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
           border: Border.all(
             color: Theme.of(context).dividerColor,
           ),
-          borderRadius: BorderRadius.circular(
-            CurvatureSize.small,
-          ),
+          borderRadius: BorderRadius.circular(CurvatureSize.small),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -40,9 +31,7 @@ class Tag extends StatelessWidget {
               Icons.circle,
               size: IconSize.small,
             ),
-            const SizedBox(
-              width: MarginSize.small,
-            ),
+            const SizedBox(width: MarginSize.small),
             Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium,

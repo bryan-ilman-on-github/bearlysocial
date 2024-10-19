@@ -4,7 +4,7 @@ import 'package:image/image.dart' as img_lib;
 class _ProfilePicNotifier extends StateNotifier<img_lib.Image?> {
   _ProfilePicNotifier() : super(null);
 
-  void setState(img_lib.Image? profilePic) => state = profilePic;
+  void setState(img_lib.Image? img) => state = img;
 }
 
 final _pod = StateNotifierProvider<_ProfilePicNotifier, img_lib.Image?>(

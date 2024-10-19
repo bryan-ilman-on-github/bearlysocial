@@ -1,5 +1,4 @@
-import 'package:bearlysocial/providers/auth_details/auth_state.dart';
-import 'package:bearlysocial/providers/net_info/net_state.dart';
+import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/themes.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/motion_util.dart';
@@ -56,7 +55,7 @@ class _AppEntryState extends ConsumerState<AppEntry> {
   void initState() {
     super.initState();
 
-    ref.read(storeNetworkInfo)().then((_) => setState(() => _loading = false));
+    // ref.read(storeNetworkInfo)().then((_) => setState(() => _loading = false));
   }
 
   @override
@@ -70,7 +69,7 @@ class _AppEntryState extends ConsumerState<AppEntry> {
       locale: context.locale,
       home: _loading
           ? const LoadingPage()
-          : ref.watch(appAuth)
+          : ref.watch(isAuthenticated)
               ? const SessionPage()
               : const AuthPage(),
       scrollBehavior: const BouncingScroll(),

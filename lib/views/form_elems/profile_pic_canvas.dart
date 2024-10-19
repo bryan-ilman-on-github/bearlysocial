@@ -1,7 +1,7 @@
 import 'package:bearlysocial/views/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/providers/form_fields/flags_pod.dart';
-import 'package:bearlysocial/providers/form_fields/profile_pic_pod.dart';
+import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/providers/profile_pic_pod.dart';
 import 'package:bearlysocial/utils/selfie_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

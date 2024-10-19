@@ -4,11 +4,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:bearlysocial/views/buttons/splash_btn.dart';
-import 'package:bearlysocial/views/form_elems/selector.dart';
-import 'package:bearlysocial/views/form_elems/social_media_links.dart';
-import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
-import 'package:bearlysocial/views/texts/warning_message.dart';
 import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
@@ -17,18 +12,23 @@ import 'package:bearlysocial/constants/native_lang_name.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/constants/txt_sym.dart';
-import 'package:bearlysocial/providers/form_fields/foci_pod.dart';
-import 'package:bearlysocial/providers/form_fields/selections_pod.dart';
-import 'package:bearlysocial/providers/form_fields/flags_pod.dart';
-import 'package:bearlysocial/providers/form_fields/profile_pic_pod.dart';
-import 'package:bearlysocial/providers/form_fields/schedule_state.dart';
+import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/providers/foci_pod.dart';
+import 'package:bearlysocial/providers/profile_pic_pod.dart';
+import 'package:bearlysocial/providers/schedule_state.dart';
+import 'package:bearlysocial/providers/selections_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/form_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/user_permission_util.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/views/form_elems/profile_pic_canvas.dart';
 import 'package:bearlysocial/views/form_elems/schedule.dart';
+import 'package:bearlysocial/views/form_elems/selector.dart';
+import 'package:bearlysocial/views/form_elems/social_media_links.dart';
+import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
 import 'package:bearlysocial/views/screens/selfie_screen.dart';
+import 'package:bearlysocial/views/texts/warning_message.dart';
 import 'package:camera/camera.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -52,22 +52,18 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  // Flags for managing state changes.
-  bool _resettingChanges = false;
-  bool _applyingChanges = false;
+  bool _canResetChanges = true;
+  bool _canApplyChanges = true;
 
-  // Text controllers for personal details.
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _interestController = TextEditingController();
   final _langController = TextEditingController();
 
-  // Text controllers for social media links.
   final _instaHandleController = TextEditingController();
   final _facebookHandleController = TextEditingController();
   final _linkedinHandleController = TextEditingController();
 
-  // Focus nodes for managing text field focus.
   final _firstNameFocusNode = FocusNode();
   final _lastNameFocusNode = FocusNode();
 
@@ -97,6 +93,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: db_key.last_name.name,
     );
 
+    // TODO: check if code suits.
     ref.read(setInterests)(
       jsonDecode(local_db.retrieveTransaction(key: db_key.interests_code.name))
           .cast<String>(),
@@ -125,6 +122,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     ref.read(setLoadingProfilePicFlag)(false);
     ref.read(setProfileSaveFlag)(true);
+
+    _canResetChanges = false;
+    _canApplyChanges = false;
   }
 
   final _allInterests = FormUtility.allInterests;
@@ -252,9 +252,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SingleChildScrollView(
           controller: widget.controller,
-          padding: const EdgeInsets.symmetric(
-            horizontal: PaddingSize.medium,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: PaddingSize.medium),
           child: Column(
             children: [
               const Align(
@@ -348,19 +346,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     verticalPadding: PaddingSize.verySmall,
                     callbackFunction: () async {
                       List<DateTime>? dateTimeRange =
-                          await FormManagement.appDateTimeRangePicker(
+                          await FormUtility.appDateTimeRangePicker(
                         context: context,
                       );
 
-                      ref.read(addTimeSlotCollection)(
-                        dateTimeRange: dateTimeRange,
-                      );
+                      // TODO: rewrite.
+                      ref.read(addTimeSlotColl)(dateTimeRange);
                     },
                     buttonColor: Theme.of(context).highlightColor,
                     borderColor: Theme.of(context).focusColor,
-                    borderRadius: BorderRadius.circular(
-                      CurvatureSize.infinity,
-                    ),
+                    borderRadius: BorderRadius.circular(CurvatureSize.infinity),
                     child: Text(
                       'Add Slot(s)',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -372,27 +367,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
               const SizedBox(height: WhiteSpaceSize.large),
               Padding(
-                padding: const EdgeInsets.only(
-                  bottom: PaddingSize.medium,
-                ),
+                padding: const EdgeInsets.only(bottom: PaddingSize.medium),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     SplashButton(
                       horizontalPadding: PaddingSize.veryLarge,
                       verticalPadding: PaddingSize.small,
-                      callbackFunction: _resettingChanges
+                      callbackFunction: _canResetChanges
                           ? null
                           : () {
-                              _resettingChanges = true;
+                              _canResetChanges = false;
                               _syncWithDatabase();
-                              _resettingChanges = false;
                             },
                       buttonColor: Colors.transparent,
                       borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(
-                        CurvatureSize.large,
-                      ),
+                      borderRadius: BorderRadius.circular(CurvatureSize.large),
                       child: Text(
                         TranslationKey.resetButton.name.tr(),
                         style:
@@ -404,16 +394,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     SplashButton(
                       horizontalPadding: PaddingSize.veryLarge,
                       verticalPadding: PaddingSize.small,
-                      callbackFunction: _applyingChanges
+                      callbackFunction: _canApplyChanges
                           ? null
                           : () {
-                              _applyingChanges = true;
+                              _canApplyChanges = false;
                               _syncWithDatabase();
-                              _applyingChanges = false;
                             },
-                      borderRadius: BorderRadius.circular(
-                        CurvatureSize.large,
-                      ),
+                      borderRadius: BorderRadius.circular(CurvatureSize.large),
                       shadow: Shadow.medium,
                       child: Text(
                         TranslationKey.applyButton.name.tr(),

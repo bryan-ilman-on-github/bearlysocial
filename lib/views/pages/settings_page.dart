@@ -1,8 +1,8 @@
+import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/views/buttons/setting_btn.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:bearlysocial/providers/auth_details/auth_state.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +40,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             SettingButton(
               icon: Icons.delete_outlined,
               label: TranslationKey.deleteAccountButton.name.tr(),
-              callbackFunction: ref.read(deleteAccount),
+              callbackFunction: () {},
               splashColor: AppColor.lightRed,
               contentColor: AppColor.heavyRed,
             ),
@@ -49,7 +49,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
             SplashButton(
               verticalPadding: PaddingSize.small,
-              callbackFunction: ref.read(exitApp),
+              callbackFunction: () => ref.read(setAuthFlag)(false),
               buttonColor: Colors.transparent,
               borderColor: AppColor.heavyRed,
               borderRadius: BorderRadius.circular(

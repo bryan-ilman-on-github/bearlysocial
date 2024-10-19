@@ -1,5 +1,5 @@
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
+import 'package:bearlysocial/providers/txt_pod.dart';
 import 'package:bearlysocial/views/sections/hero_section.dart';
 import 'package:bearlysocial/views/sections/otp_section.dart';
 import 'package:flutter/material.dart';
@@ -17,14 +17,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: PaddingSize.large,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: PaddingSize.large),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 512.0,
-            ),
+            constraints: const BoxConstraints(maxWidth: 512.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,26 +32,21 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     image: const DecorationImage(
                       image: AssetImage('assets/pngs/bearlysocial_icon.png'),
                     ),
-                    boxShadow: [
-                      Shadow.medium,
-                    ],
+                    boxShadow: [Shadow.medium],
                   ),
                 ),
-                const SizedBox(
-                  height: WhiteSpaceSize.small,
-                ),
+                const SizedBox(height: WhiteSpaceSize.small),
                 Stack(
                   children: <Widget>[
                     AnimatedOpacity(
-                      opacity: ref.watch(authPageEmailAddr).isEmpty ? 1.0 : 0.0,
+                      opacity: ref.watch(authEmailAddr).isEmpty ? 1.0 : 0.0,
                       duration: const Duration(
                         milliseconds: AnimationDuration.medium,
                       ),
                       child: const HeroSection(),
                     ),
                     AnimatedOpacity(
-                      opacity:
-                          ref.watch(authPageEmailAddr).isNotEmpty ? 1.0 : 0.0,
+                      opacity: ref.watch(authEmailAddr).isNotEmpty ? 1.0 : 0.0,
                       duration: const Duration(
                         milliseconds: AnimationDuration.medium,
                       ),
@@ -64,7 +55,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                           milliseconds: AnimationDuration.medium,
                         ),
                         transform: Matrix4.translationValues(
-                          ref.watch(authPageEmailAddr).isNotEmpty
+                          ref.watch(authEmailAddr).isNotEmpty
                               ? 0
                               : MediaQuery.of(context).size.width / 2,
                           0,

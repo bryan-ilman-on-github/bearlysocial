@@ -40,16 +40,10 @@ class SplashButton extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.transparent,
-        ),
-        borderRadius: borderRadius ??
-            BorderRadius.circular(
-              CurvatureSize.large,
-            ),
-        boxShadow: [
-          if (shadow != null) shadow!,
-        ],
+        border: Border.all(color: Colors.transparent),
+        borderRadius:
+            borderRadius ?? BorderRadius.circular(CurvatureSize.large),
+        boxShadow: [if (shadow != null) shadow!],
       ),
       child: Material(
         color: buttonColor ?? Theme.of(context).focusColor,
@@ -58,18 +52,14 @@ class SplashButton extends StatelessWidget {
             width: borderThickness ?? ThicknessSize.medium,
             color: borderColor ?? Colors.transparent,
           ),
-          borderRadius: borderRadius ??
-              BorderRadius.circular(
-                CurvatureSize.large,
-              ),
+          borderRadius:
+              borderRadius ?? BorderRadius.circular(CurvatureSize.large),
         ),
         child: InkWell(
           onTap: callbackFunction?.call,
           splashColor: splashColor,
-          borderRadius: borderRadius ??
-              BorderRadius.circular(
-                CurvatureSize.large,
-              ),
+          borderRadius:
+              borderRadius ?? BorderRadius.circular(CurvatureSize.large),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: horizontalPadding ?? PaddingSize.zero,

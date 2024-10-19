@@ -5,7 +5,7 @@ import 'package:bearlysocial/constants/cloud_apis.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:bearlysocial/providers/auth_details/auth_page_email_addr_state.dart';
+import 'package:bearlysocial/providers/txt_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +54,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
         setState(() {
           _emailAddrErrTxt = null;
         });
-        ref.read(setAuthPageEmailAddr)(emailAddr: emailAddr);
+        ref.read(setAuthEmailAddr)(emailAddr);
       },
       onBadRequest: (response) {
         setState(() {
@@ -80,32 +80,23 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
                 style: Theme.of(context).textTheme.displayLarge,
               ),
             ),
-            const Expanded(
-              flex: 20,
-              child: SizedBox(),
-            ),
+            const Expanded(flex: 20, child: SizedBox()),
           ],
         ),
-        const SizedBox(
-          height: WhiteSpaceSize.veryLarge,
-        ),
+        const SizedBox(height: WhiteSpaceSize.veryLarge),
         UnderlinedTextField(
-          enabled: ref.watch(authPageEmailAddr).isEmpty,
+          enabled: ref.watch(authEmailAddr).isEmpty,
           label: TranslationKey.emailAddrLabel.name.tr(),
           controller: _emailAddrController,
           focusNode: _emailAddrFocusNode,
           errorText: _emailAddrErrTxt,
         ),
-        const SizedBox(
-          height: WhiteSpaceSize.large,
-        ),
+        const SizedBox(height: WhiteSpaceSize.large),
         SplashButton(
           width: double.infinity,
           verticalPadding: PaddingSize.small,
-          borderRadius: BorderRadius.circular(
-            CurvatureSize.large,
-          ),
-          callbackFunction: ref.watch(authPageEmailAddr).isEmpty
+          borderRadius: BorderRadius.circular(CurvatureSize.large),
+          callbackFunction: ref.watch(authEmailAddr).isEmpty
               ? _canInvokeCallback
                   ? () {
                       _canInvokeCallback = false;
@@ -119,9 +110,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
                   'Continue',
                   style: Theme.of(context).textTheme.titleMedium,
                 )
-              : const ProgressSpinner(
-                  invertColor: true,
-                ),
+              : const ProgressSpinner(invertColor: true),
         ),
       ],
     );

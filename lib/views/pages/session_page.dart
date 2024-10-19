@@ -38,9 +38,7 @@ class _SessionPage extends State<SessionPage> {
   void _scrollToTop() {
     _controller.animateTo(
       0.0,
-      duration: const Duration(
-        milliseconds: AnimationDuration.medium,
-      ),
+      duration: const Duration(milliseconds: AnimationDuration.medium),
       curve: Curves.easeInOut,
     );
   }

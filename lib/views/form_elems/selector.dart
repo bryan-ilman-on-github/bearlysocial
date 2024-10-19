@@ -62,7 +62,7 @@ class Selector extends StatelessWidget {
             runSpacing: MarginSize.veryLarge,
             children: FormUtility.buildTags(
               labels: entries,
-              callbackFunction: removeEntry,
+              removeEntry: removeEntry,
             ),
           ),
         ],

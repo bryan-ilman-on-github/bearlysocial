@@ -127,12 +127,12 @@ class FormUtility {
   /// Returns a list of `Tag` objects, each created with a label from the `labels` and linked to the provided `callbackFunction`.
   static List<Tag> buildTags({
     required List<String> labels,
-    required Function callbackFunction,
+    required Function removeEntry,
   }) {
     List<Tag> tags = [];
 
     for (var label in labels) {
-      tags.add(Tag(label: label, callbackFunction: callbackFunction));
+      tags.add(Tag(label: label, removeSelf: () => removeEntry(label)));
     }
 
     return tags;

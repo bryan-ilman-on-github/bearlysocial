@@ -58,9 +58,7 @@ class ScheduleStateNotifier extends StateNotifier<SplayTreeMap> {
     return hasConflictWithMeetups;
   }
 
-  void addTimeSlotCollection({
-    required List<DateTime>? dateTimeRange,
-  }) {
+  void addTimeSlotCollection(List<DateTime>? dateTimeRange) {
     if (dateTimeRange == null) return;
 
     if (!_hasOverlap(

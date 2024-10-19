@@ -22,17 +22,13 @@ class BottomSheet extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(
-            CurvatureSize.large,
-          ),
+          top: Radius.circular(CurvatureSize.large),
         ),
       ),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(
-              PaddingSize.medium,
-            ),
+            padding: const EdgeInsets.all(PaddingSize.medium),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -45,9 +41,7 @@ class BottomSheet extends StatelessWidget {
                     Icons.close_rounded,
                   ),
                 ),
-                const SizedBox(
-                  width: WhiteSpaceSize.small,
-                ),
+                const SizedBox(width: WhiteSpaceSize.small),
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleLarge,
@@ -58,18 +52,14 @@ class BottomSheet extends StatelessWidget {
           const HorizontalLine(),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(
-                PaddingSize.medium,
-              ),
+              padding: const EdgeInsets.all(PaddingSize.medium),
               child: content,
             ),
           ),
           if (closure != null) ...[
             const HorizontalLine(),
             Padding(
-              padding: const EdgeInsets.all(
-                PaddingSize.medium,
-              ),
+              padding: const EdgeInsets.all(PaddingSize.medium),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: closure as List<Widget>,
