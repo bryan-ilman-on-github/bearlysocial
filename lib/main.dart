@@ -49,7 +49,7 @@ class AppEntry extends ConsumerStatefulWidget {
 }
 
 class _AppEntryState extends ConsumerState<AppEntry> {
-  bool _loading = true;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -69,7 +69,7 @@ class _AppEntryState extends ConsumerState<AppEntry> {
       locale: context.locale,
       home: _loading
           ? const LoadingPage()
-          : ref.watch(isAuthenticated)
+          : !ref.watch(isAuthenticated)
               ? const SessionPage()
               : const AuthPage(),
       scrollBehavior: const BouncingScroll(),

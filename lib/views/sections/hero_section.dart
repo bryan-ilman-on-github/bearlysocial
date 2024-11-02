@@ -1,7 +1,7 @@
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
 import 'package:bearlysocial/views/lines/progress_spinner.dart';
-import 'package:bearlysocial/constants/cloud_apis.dart';
+import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
@@ -45,7 +45,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
     final String emailAddr = _emailAddrController.text;
 
     await CloudUtility.sendRequest(
-      endpoint: DigitalOceanDropletAPI.requestOTP,
+      endpoint: DigitalOceanDropletURL.requestOTP,
       method: HTTPmethod.GET.name,
       body: {
         'email_address': emailAddr,

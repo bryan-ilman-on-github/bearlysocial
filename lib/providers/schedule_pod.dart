@@ -3,12 +3,12 @@ import 'dart:collection';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ScheduleStateNotifier extends StateNotifier<SplayTreeMap> {
-  ScheduleStateNotifier() : super(SplayTreeMap());
+class _ScheduleNotifier extends StateNotifier<SplayTreeMap> {
+  _ScheduleNotifier() : super(SplayTreeMap());
 
   final fullDateTimeFormat = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
 
-  void setScheduleState(SplayTreeMap timeSlots) {
+  void setState(SplayTreeMap timeSlots) {
     state = SplayTreeMap.from(timeSlots);
   }
 
@@ -109,31 +109,27 @@ class ScheduleStateNotifier extends StateNotifier<SplayTreeMap> {
   }
 }
 
-final scheduleStateNotifierProvider =
-    StateNotifierProvider<ScheduleStateNotifier, SplayTreeMap>(
-  (ref) => ScheduleStateNotifier(),
+final _scheduleNotifierProvider =
+    StateNotifierProvider<_ScheduleNotifier, SplayTreeMap>(
+  (ref) => _ScheduleNotifier(),
 );
 
-final scheduleState = Provider((ref) {
-  return ref.watch(scheduleStateNotifierProvider);
+final schedule = Provider((ref) {
+  return ref.watch(_scheduleNotifierProvider);
 });
 
 final setSchedule = Provider((ref) {
-  return ref.read(scheduleStateNotifierProvider.notifier).setScheduleState;
+  return ref.read(_scheduleNotifierProvider.notifier).setState;
 });
 
 final addTimeSlotColl = Provider((ref) {
-  return ref.read(scheduleStateNotifierProvider.notifier).addTimeSlotCollection;
+  return ref.read(_scheduleNotifierProvider.notifier).addTimeSlotCollection;
 });
 
 final updateTimeSlotColl = Provider((ref) {
-  return ref
-      .read(scheduleStateNotifierProvider.notifier)
-      .updateTimeSlotCollection;
+  return ref.read(_scheduleNotifierProvider.notifier).updateTimeSlotCollection;
 });
 
 final deleteTimeSlotCollection = Provider((ref) {
-  return ref
-      .read(scheduleStateNotifierProvider.notifier)
-      .deleteTimeSlotCollection;
+  return ref.read(_scheduleNotifierProvider.notifier).deleteTimeSlotCollection;
 });

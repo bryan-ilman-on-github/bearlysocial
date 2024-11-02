@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
-import 'package:bearlysocial/constants/cloud_apis.dart';
+import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
@@ -28,7 +28,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
 
   void _validateOTP() async {
     await CloudUtility.sendRequest(
-      endpoint: DigitalOceanDropletAPI.validateOTP,
+      endpoint: DigitalOceanDropletURL.validateOTP,
       method: HTTPmethod.POST.name,
       body: {
         'email_address': ref.read(authEmailAddr),
@@ -36,7 +36,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
       },
       onSuccess: (response) async {
         await CloudUtility.sendRequest(
-          endpoint: DigitalOceanSpacesAPI.generateURL(response['uid']),
+          endpoint: DigitalOceanSpacesURL.generateURL(response['uid']),
           method: HTTPmethod.GET.name,
           onSuccess: (pic) {
             LocalDatabaseUtility.insertTransaction(

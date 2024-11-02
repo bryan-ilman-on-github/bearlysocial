@@ -1,4 +1,4 @@
-class DigitalOceanSpacesAPI {
+class DigitalOceanSpacesURL {
   /// The domain name for DigitalOcean Spaces.
   static const String _domain = 'digitaloceanspaces';
 
@@ -22,7 +22,7 @@ class DigitalOceanSpacesAPI {
   }
 }
 
-class DigitalOceanDropletAPI {
+class DigitalOceanDropletURL {
   // The base path for DigitalOcean droplet.
   static const String _basePath = 'http://localhost:8080';
 

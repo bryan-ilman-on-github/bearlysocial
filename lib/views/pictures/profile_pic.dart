@@ -31,21 +31,21 @@ class _ProfilePictureState extends State<ProfilePicture> {
   void initState() {
     super.initState();
 
-    DigitalOceanSpacesAPI.downloadProfilePic(
-      uid: widget.uid,
-    ).then((base64ProfilePic) {
-      _canvas = SelfieCaptureOperation.buildProfilePictureCanvas(
-        profilePic: base64ProfilePic == null
-            ? null
-            : img_lib.decodeImage(base64Decode(base64ProfilePic)),
-      );
+    // DigitalOceanSpacesAPI.downloadProfilePic(
+    //   uid: widget.uid,
+    // ).then((base64ProfilePic) {
+    //   _canvas = SelfieUtility.buildCircularImage(
+    //     base64ProfilePic == null
+    //         ? null
+    //         : img_lib.decodeImage(base64Decode(base64ProfilePic)),
+    //   );
 
-      if (base64ProfilePic != null) _enableBorder = false;
+    //   if (base64ProfilePic != null) _enableBorder = false;
 
-      setState(() {
-        _loading = false;
-      });
-    });
+    //   setState(() {
+    //     _loading = false;
+    //   });
+    // });
   }
 
   @override

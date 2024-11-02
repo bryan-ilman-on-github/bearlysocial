@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:bearlysocial/views/buttons/splash_btn.dart';
-import 'package:bearlysocial/views/texts/animated_elliptical_txt.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
+import 'package:bearlysocial/providers/screen_size_pod.dart';
 import 'package:bearlysocial/utils/fs_util.dart';
 import 'package:bearlysocial/utils/selfie_util.dart';
+import 'package:bearlysocial/views/buttons/cancel_btn.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/texts/animated_elliptical_txt.dart';
 import 'package:camera/camera.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -27,28 +29,27 @@ class SelfieScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SelfieScreen> createState() => _SelfieScreen();
+  ConsumerState<SelfieScreen> createState() => _SelfieScreenState();
 }
 
-class _SelfieScreen extends ConsumerState<SelfieScreen>
+class _SelfieScreenState extends ConsumerState<SelfieScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late CameraController _camController;
+  late AnimationController _looper;
 
+  late CameraController _camController;
   late Future<void> _camInit;
 
-  double? _yAxisValue;
-  double? _xAxisValue;
+  late _Position _cancelButtonPosition;
 
   Face? _prevDetectedFace;
-  bool _detecting = false;
+  bool _isDetecting = false;
 
   Timer? _focusTimer;
   bool _settingFocus = false;
 
   XFile? _selfie;
 
-  final FaceDetector _faceDetector = GoogleMlKit.vision.faceDetector(
+  final _faceDetector = GoogleML.vision.faceDetector(
     FaceDetectorOptions(
       performanceMode: FaceDetectorMode.accurate,
       enableClassification: true,
@@ -56,42 +57,38 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
     ),
   );
 
-  void _calculateCameraFrameCancelButtonPosition() {
+  void _updateCancelButtonPosition() {
     final screenSize = MediaQuery.of(context).size;
-    final frameSize = SelfieUtility.calculateCameraFrameSize(
+    final frameSize = SelfieUtility.calculateCamFrameSize(
       screenSize: screenSize,
     );
-
     final frameRadius = frameSize / 2;
-    const angleSize = (45 / 180) * pi; // in radian
+    const angle = pi / 4; // 45 degrees in radians
 
-    final top = (screenSize.height / 2) - (sin(angleSize) * frameRadius);
-    final right = (screenSize.width / 2) - (cos(angleSize) * frameRadius);
+    final top = (screenSize.height / 2) - (sin(angle) * frameRadius) - 24.0;
+    final right = (screenSize.width / 2) - (cos(angle) * frameRadius) - 16.0;
+
+    ref.read(setScreenSize)(screenSize);
 
     setState(() {
-      _yAxisValue = top - 24.0; // this number is arbitrary
-      _xAxisValue = right - 16.0; // this number is arbitrary
+      _cancelButtonPosition = _Position(top: top, right: right);
     });
   }
 
-  void _insertCamFlash() {
+  void _camFlash() {
     if (!mounted) return;
 
-    OverlayEntry camFlash = OverlayEntry(
-      builder: (ctx) => Positioned.fill(
-        child: Container(
-          color: Colors.white,
-        ),
+    OverlayEntry light = OverlayEntry(
+      builder: (_) => Positioned.fill(
+        child: Container(color: Colors.white),
       ),
     );
 
-    Overlay.of(context).insert(camFlash);
+    Overlay.of(context).insert(light);
 
     Future.delayed(
-      const Duration(
-        milliseconds: AnimationDuration.quick,
-      ),
-      () => camFlash.remove(),
+      const Duration(milliseconds: AnimationDuration.quick),
+      () => light.remove(),
     );
   }
 
@@ -99,31 +96,26 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
-      duration: const Duration(
-        milliseconds: AnimationDuration.slow,
-      ),
+    _looper = AnimationController(
+      duration: const Duration(milliseconds: AnimationDuration.slow),
       vsync: this,
     )..repeat(reverse: true);
 
     _camController = CameraController(
       widget.frontCamera,
-      ResolutionPreset.ultraHigh,
+      ResolutionPreset.max,
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
 
     _camInit = _camController.initialize().then((_) {
       if (!mounted) return;
 
-      final Size screenSize = MediaQuery.of(context).size;
-
-      _camController.startImageStream((CameraImage img) async {
-        if (!_detecting) {
-          _detecting = true;
+      _camController.startImageStream((image) async {
+        if (!_isDetecting) {
+          _isDetecting = true; // TODO: check if smooth.
 
           final Face? nowDetectedFace = await SelfieUtility.detectFace(
-            screenSize: screenSize,
-            image: img,
+            image: image,
             sensorOrientation: widget.frontCamera.sensorOrientation,
             faceDetector: _faceDetector,
           );
@@ -146,7 +138,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
             );
 
             _selfie = await _camController.takePicture();
-            _insertCamFlash();
+            _camFlash();
 
             await _camController.stopImageStream();
 
@@ -156,7 +148,8 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
               return;
             }
 
-            final String renamedFilePath = FileManagement.addSuffixToFilePath(
+            final String renamedFilePath =
+                FileSystemUtility.addSuffixToFilePath(
               filePath: initialFilePath,
               suffix: '-compressed',
             );
@@ -170,7 +163,6 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
             final img_lib.Image? profilePic =
                 await SelfieUtility.buildProfilePic(
               imagePath: renamedFilePath,
-              screenSize: screenSize,
             );
 
             widget.onSuccess(profilePic);
@@ -180,7 +172,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
             _prevDetectedFace = nowDetectedFace;
           });
 
-          _detecting = false;
+          _isDetecting = false;
         }
       });
     });
@@ -189,7 +181,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
   @override
   void dispose() {
     _faceDetector.close();
-    _animationController.dispose();
+    _looper.dispose();
     _camController.dispose();
 
     super.dispose();
@@ -197,7 +189,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
 
   @override
   Widget build(BuildContext context) {
-    _calculateCameraFrameCancelButtonPosition();
+    _updateCancelButtonPosition();
 
     final whiteTextStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: TextSize.large,
@@ -219,7 +211,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
                   Expanded(
                     child: _prevDetectedFace == null
                         ? AnimatedEllipticalText(
-                            controller: _animationController,
+                            controller: _looper,
                             textStyle: whiteTextStyle,
                             leadingText: 'Scanning facial features',
                           )
@@ -243,7 +235,7 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
                   Expanded(
                     child: _settingFocus
                         ? AnimatedEllipticalText(
-                            controller: _animationController,
+                            controller: _looper,
                             textStyle: whiteTextStyle,
                             leadingText: 'Adjusting focus',
                           )
@@ -276,24 +268,9 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
                   );
                 },
               ),
-              Positioned(
-                top: _yAxisValue,
-                right: _xAxisValue,
-                child: UnconstrainedBox(
-                  child: SplashButton(
-                    horizontalPadding: PaddingSize.verySmall,
-                    verticalPadding: PaddingSize.verySmall,
-                    buttonColor: Colors.white,
-                    borderRadius: BorderRadius.circular(
-                      CurvatureSize.infinity,
-                    ),
-                    callbackFunction: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.close_rounded,
-                      color: AppColor.heavyGray,
-                    ),
-                  ),
-                ),
+              CancelButton(
+                top: _cancelButtonPosition.top,
+                right: _cancelButtonPosition.right,
               ),
             ],
           );
@@ -301,4 +278,11 @@ class _SelfieScreen extends ConsumerState<SelfieScreen>
       ),
     );
   }
+}
+
+class _Position {
+  final double top;
+  final double right;
+
+  _Position({required this.top, required this.right});
 }

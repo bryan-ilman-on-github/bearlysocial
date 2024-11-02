@@ -14,7 +14,7 @@ class SelfieUtility {
     var frameSize = (screenSize.width < screenSize.height)
         ? screenSize.width
         : screenSize.height / 2;
-    frameSize -= PaddingSize.verySmall; // minus the frame's padding value
+    frameSize -= PaddingSize.verySmall; // minus the frame's padding value.
 
     return frameSize;
   }

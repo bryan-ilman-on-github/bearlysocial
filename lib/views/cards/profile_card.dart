@@ -53,7 +53,7 @@ class ProfileCard extends StatelessWidget {
                 bottom: 0.0,
                 right: 0.0,
                 child: DecoratedText(
-                  backgroundColor: FormManagement.calculateRatingColor(
+                  backgroundColor: FormUtility.calculateRatingColor(
                     rating: 4.2,
                   ),
                   text: '4.2',

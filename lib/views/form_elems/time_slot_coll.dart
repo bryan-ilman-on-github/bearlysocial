@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/views/pictures/profile_pic.dart' as reusables;
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/providers/schedule_state.dart';
+import 'package:bearlysocial/providers/schedule_pod.dart';
 import 'package:bearlysocial/utils/form_util.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -108,11 +108,11 @@ class _TimeSlotCollectionState extends ConsumerState<TimeSlotCollection> {
                   verticalPadding: PaddingSize.verySmall,
                   callbackFunction: () async {
                     List<DateTime>? currDateTimeRange =
-                        await FormManagement.appDateTimeRangePicker(
+                        await FormUtility.appDateTimeRangePicker(
                       context: context,
                     );
 
-                    ref.read(updateTimeSlotCollection)(
+                    ref.read(updateTimeSlotColl)(
                       prevDateTimeRange: widget.dateTimeRange,
                       currDateTimeRange: currDateTimeRange,
                       meetups: widget.meetups,

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:bearlysocial/constants/cloud_apis.dart';
+import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
@@ -14,8 +14,8 @@ import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/providers/foci_pod.dart';
-import 'package:bearlysocial/providers/profile_pic_pod.dart';
-import 'package:bearlysocial/providers/schedule_state.dart';
+import 'package:bearlysocial/providers/img_pod.dart';
+import 'package:bearlysocial/providers/schedule_pod.dart';
 import 'package:bearlysocial/providers/selections_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/form_util.dart';
@@ -180,10 +180,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           PageRouteBuilder(
             pageBuilder: (_, p, q) => SelfieScreen(
               frontCamera: frontCamera,
-              onSuccess: (img_lib.Image? img) {
+              onSuccess: (image) {
                 // TODO: check if all is smooth.
                 ref.read(setLoadingProfilePicFlag)(true);
-                ref.read(setProfilePic)(img);
+                ref.read(setProfilePic)(image);
                 ref.read(setLoadingProfilePicFlag)(false);
                 ref.read(setProfileSaveFlag)(false);
               },

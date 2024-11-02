@@ -6,15 +6,15 @@ class _FocusNotifier extends StateNotifier<bool> {
   void toggleState() => state = !state;
 }
 
-final _firstNameFocusProd =
+final _firstNameFocusPod =
     StateNotifierProvider<_FocusNotifier, bool>((ref) => _FocusNotifier());
-final _lastNameFocusProd =
+final _lastNameFocusPod =
     StateNotifierProvider<_FocusNotifier, bool>((ref) => _FocusNotifier());
 
-final firstNameFocus = Provider((ref) => ref.watch(_firstNameFocusProd));
-final lastNameFocus = Provider((ref) => ref.watch(_lastNameFocusProd));
+final firstNameFocus = Provider((ref) => ref.watch(_firstNameFocusPod));
+final lastNameFocus = Provider((ref) => ref.watch(_lastNameFocusPod));
 
 final toggleFirstNameFocus =
-    Provider((ref) => ref.read(_firstNameFocusProd.notifier).toggleState);
+    Provider((ref) => ref.read(_firstNameFocusPod.notifier).toggleState);
 final toggleLastNameFocus =
-    Provider((ref) => ref.read(_lastNameFocusProd.notifier).toggleState);
+    Provider((ref) => ref.read(_lastNameFocusPod.notifier).toggleState);

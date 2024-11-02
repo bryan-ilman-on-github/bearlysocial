@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/providers/schedule_state.dart';
+import 'package:bearlysocial/providers/schedule_pod.dart';
 import 'package:bearlysocial/views/form_elems/time_slot_coll.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
