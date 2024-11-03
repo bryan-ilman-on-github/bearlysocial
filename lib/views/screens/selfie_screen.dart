@@ -58,17 +58,16 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
   );
 
   void _updateCancelButtonPosition() {
-    final screenSize = MediaQuery.of(context).size;
-    final frameSize = SelfieUtility.calculateCamFrameSize(
-      screenSize: screenSize,
-    );
-    final frameRadius = frameSize / 2;
-    const angle = pi / 4; // 45 degrees in radians
+    ref.read(setScreenSize)(MediaQuery.of(context).size);
 
-    final top = (screenSize.height / 2) - (sin(angle) * frameRadius) - 24.0;
-    final right = (screenSize.width / 2) - (cos(angle) * frameRadius) - 16.0;
+    final screenWidth = ref.read(screenSize).width;
+    final screenHeight = ref.read(screenSize).height;
 
-    ref.read(setScreenSize)(screenSize);
+    final camFrameSize = SelfieUtility.calculateCamFrameSize();
+    final camFrameRadius = camFrameSize / 2;
+
+    final top = (screenHeight / 2) - (sin(pi / 4) * camFrameRadius) - 24.0;
+    final right = (screenWidth / 2) - (cos(pi / 4) * camFrameRadius) - 16.0;
 
     setState(() {
       _cancelButtonPosition = _Position(top: top, right: right);

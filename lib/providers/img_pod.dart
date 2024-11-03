@@ -7,11 +7,10 @@ class _ImageNotifier extends StateNotifier<img_lib.Image?> {
   void setState(img) => state = img;
 }
 
-final _profilePicPod = StateNotifierProvider<_ImageNotifier, img_lib.Image?>(
+final _photoPod = StateNotifierProvider<_ImageNotifier, img_lib.Image?>(
   (ref) => _ImageNotifier(),
 );
 
-final profilePic = Provider((ref) => ref.watch(_profilePicPod));
+final photo = Provider((ref) => ref.watch(_photoPod));
 
-final setProfilePic =
-    Provider((ref) => ref.read(_profilePicPod.notifier).setState);
+final setPhoto = Provider((ref) => ref.read(_photoPod.notifier).setState);

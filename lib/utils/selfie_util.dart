@@ -1,38 +1,47 @@
 import 'dart:io';
 
 import 'package:bearlysocial/constants/design_tokens.dart';
+import 'package:bearlysocial/providers/screen_size_pod.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
+import 'package:isar/isar.dart';
+
+final ref = ProviderContainer();
+
+late double screenWidth, screenHeight;
+
+void _updateScreenSize() {
+  screenWidth = ref.read(screenSize).width;
+  screenHeight = ref.read(screenSize).height;
+}
 
 class SelfieUtility {
-  static double calculateCamFrameSize({
-    required Size screenSize,
-  }) {
-    var frameSize = (screenSize.width < screenSize.height)
-        ? screenSize.width
-        : screenSize.height / 2;
-    frameSize -= PaddingSize.verySmall; // minus the frame's padding value.
+  static double calculateCamFrameSize() {
+    _updateScreenSize();
 
-    return frameSize;
+    var camFrameSize = (screenWidth < screenHeight) //
+        ? screenWidth
+        : screenHeight / 2;
+    camFrameSize -= PaddingSize.verySmall;
+
+    return camFrameSize;
   }
 
   static Future<Face?> detectFace({
-    required Size screenSize,
     required int sensorOrientation,
     required CameraImage image,
     required FaceDetector faceDetector,
   }) async {
-    final Uint8List completeBytes = extractBytes(image: image);
-    final InputImageMetadata imgMetadata = buildImageMetadata(
-      image: image,
-      sensorOrientation: sensorOrientation,
-    );
     final InputImage preppedImage = InputImage.fromBytes(
-      bytes: completeBytes,
-      metadata: imgMetadata,
+      bytes: _extractBytes(image),
+      metadata: _buildImageMetadata(
+        image: image,
+        sensorOrientation: sensorOrientation,
+      ),
     );
     final List<Face> detectedFaces = await faceDetector.processImage(
       preppedImage,
@@ -41,13 +50,10 @@ class SelfieUtility {
     return findCenteredFace(
       faces: detectedFaces,
       image: image,
-      screenSize: screenSize,
     );
   }
 
-  static Uint8List extractBytes({
-    required CameraImage image,
-  }) {
+  static Uint8List _extractBytes(CameraImage image) {
     final WriteBuffer bytesInBuffer = WriteBuffer();
 
     for (final plane in image.planes) {
@@ -57,27 +63,22 @@ class SelfieUtility {
     return bytesInBuffer.done().buffer.asUint8List();
   }
 
-  static InputImageMetadata buildImageMetadata({
+  static InputImageMetadata _buildImageMetadata({
     required CameraImage image,
     required int sensorOrientation,
   }) {
-    final Size imgSize = Size(
-      image.width.toDouble(),
-      image.height.toDouble(),
-    );
+    final size = Size(image.width.toDouble(), image.height.toDouble());
 
-    final InputImageRotation imgRot =
-        InputImageRotationValue.fromRawValue(sensorOrientation) ??
-            InputImageRotation.rotation0deg;
+    final rotation = InputImageRotationValue.fromRawValue(sensorOrientation) ??
+        InputImageRotation.rotation0deg;
 
-    final InputImageFormat imgFormat =
-        InputImageFormatValue.fromRawValue(image.format.raw) ??
-            InputImageFormat.nv21;
+    final format = InputImageFormatValue.fromRawValue(image.format.raw) ??
+        InputImageFormat.nv21;
 
     return InputImageMetadata(
-      size: imgSize,
-      rotation: imgRot,
-      format: imgFormat,
+      size: size,
+      rotation: rotation,
+      format: format,
       bytesPerRow: image.planes[0].bytesPerRow,
     );
   }
@@ -85,9 +86,11 @@ class SelfieUtility {
   static Face? findCenteredFace({
     required List<Face> faces,
     required CameraImage image,
-    required Size screenSize,
   }) {
-    final screenCenter = Offset(screenSize.width / 2, screenSize.height / 2);
+    final screenWidth = ref.read(screenSize).width;
+    final screenHeight = ref.read(screenSize).height;
+
+    final screenCenter = Offset(screenWidth / 2, screenHeight / 2);
 
     for (final Face face in faces) {
       final Rect facialBoundingBox = normalizeBoundingBox(
@@ -96,7 +99,6 @@ class SelfieUtility {
           image.width.toDouble(),
           image.height.toDouble(),
         ),
-        screenSize: screenSize,
       );
 
       final Offset faceCenter = Offset(
@@ -127,15 +129,14 @@ class SelfieUtility {
   static Rect normalizeBoundingBox({
     required Rect rect,
     required Size imageSize,
-    required Size screenSize,
   }) {
-    final double scaleX = screenSize.width / imageSize.height;
-    final double scaleY = screenSize.height / imageSize.width;
+    final double scaleX = screenWidth / imageSize.height;
+    final double scaleY = screenHeight / imageSize.width;
 
     final double scale = scaleX > scaleY ? scaleX : scaleY;
     final Offset offset = Offset(
-      (screenSize.width - imageSize.height * scale) / 2,
-      (screenSize.height - imageSize.width * scale) / 2,
+      (screenWidth - imageSize.height * scale) / 2,
+      (screenHeight - imageSize.width * scale) / 2,
     );
 
     return Rect.fromLTWH(
@@ -170,22 +171,21 @@ class SelfieUtility {
 
   static Future<img_lib.Image?> buildProfilePic({
     required String imagePath,
-    required Size screenSize,
   }) async {
     final img_lib.Image? image = img_lib.decodeImage(
       await File(imagePath).readAsBytes(),
     );
 
     if (image != null) {
-      final int newWidth = screenSize.width.toInt();
-      final int newHeight = screenSize.height.toInt();
+      final int newWidth = screenWidth.toInt();
+      final int newHeight = screenHeight.toInt();
       final img_lib.Image stretchedImage = img_lib.copyResize(
         image,
         width: newWidth,
         height: newHeight,
       );
 
-      final int size = calculateCamFrameSize(screenSize: screenSize).toInt();
+      final int size = calculateCamFrameSize().toInt();
       final int offsetX = (stretchedImage.width - size) ~/ 2;
       final int offsetY = (stretchedImage.height - size) ~/ 2;
 

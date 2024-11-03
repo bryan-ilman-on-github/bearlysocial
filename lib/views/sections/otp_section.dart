@@ -38,10 +38,10 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
         await CloudUtility.sendRequest(
           endpoint: DigitalOceanSpacesURL.generateURL(response['uid']),
           method: HTTPmethod.GET.name,
-          onSuccess: (pic) {
+          onSuccess: (photo) {
             LocalDatabaseUtility.insertTransaction(
-              key: DatabaseKey.base_64_profile_pic.name,
-              value: base64Encode(pic),
+              key: DatabaseKey.photo.name,
+              value: base64Encode(photo),
             );
           },
           onBadRequest: (_) {},
