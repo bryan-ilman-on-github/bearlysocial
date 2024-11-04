@@ -5,7 +5,7 @@ import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:bearlysocial/providers/txt_pod.dart';
+import 'package:bearlysocial/providers/txts_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

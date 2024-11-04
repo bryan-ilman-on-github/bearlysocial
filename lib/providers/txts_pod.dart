@@ -1,8 +1,7 @@
-import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class _TextNotifier extends StateNotifier<String> {
-  _TextNotifier() : super(TextSymbol.emptyString);
+  _TextNotifier() : super('');
 
   void setState(String text) => state = text;
 }

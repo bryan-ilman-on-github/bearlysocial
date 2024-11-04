@@ -1,5 +1,5 @@
 import 'package:bearlysocial/providers/flags_pod.dart';
-import 'package:bearlysocial/themes.dart';
+import 'package:bearlysocial/providers/theme_pod.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/motion_util.dart';
 import 'package:bearlysocial/utils/settings_util.dart';
@@ -62,8 +62,7 @@ class _AppEntryState extends ConsumerState<AppEntry> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BearlySocial',
-      theme: createTheme(lightMode: true),
-      darkTheme: createTheme(lightMode: false),
+      theme: ref.watch(theme),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,

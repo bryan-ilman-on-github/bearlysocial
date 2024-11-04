@@ -14,9 +14,9 @@ import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/providers/foci_pod.dart';
-import 'package:bearlysocial/providers/img_pod.dart';
+import 'package:bearlysocial/providers/imgs_pod.dart';
 import 'package:bearlysocial/providers/schedule_pod.dart';
-import 'package:bearlysocial/providers/selections_pod.dart';
+import 'package:bearlysocial/providers/lists_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/form_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
@@ -75,15 +75,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   void _syncWithDatabase() async {
-    ref.read(setLoadingProfilePicFlag)(true);
+    ref.read(setLoadingPhotoFlag)(true);
 
     await Future.delayed(Duration(seconds: 10)); // TODO: check this!
 
-    String bytes =
-        local_db.retrieveTransaction(key: db_key.base_64_profile_pic.name);
+    String bytes = local_db.retrieveTransaction(key: db_key.photo.name);
 
     if (bytes.isNotEmpty) {
-      ref.read(setProfilePic)(img_lib.decodeImage(base64Decode(bytes)));
+      ref.read(setPhoto)(img_lib.decodeImage(base64Decode(bytes)));
     }
 
     _firstNameController.text = local_db.retrieveTransaction(
@@ -95,11 +94,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     // TODO: check if code suits.
     ref.read(setInterests)(
-      jsonDecode(local_db.retrieveTransaction(key: db_key.interests_code.name))
+      jsonDecode(local_db.retrieveTransaction(key: db_key.interests.name))
           .cast<String>(),
     );
     ref.read(setLangs)(
-      jsonDecode(local_db.retrieveTransaction(key: db_key.langs_code.name))
+      jsonDecode(local_db.retrieveTransaction(key: db_key.langs.name))
           .cast<String>(),
     );
 
@@ -120,7 +119,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       local_db.retrieveTransaction(key: db_key.schedule.name),
     )));
 
-    ref.read(setLoadingProfilePicFlag)(false);
+    ref.read(setLoadingPhotoFlag)(false);
     ref.read(setProfileSaveFlag)(true);
 
     _canResetChanges = false;
@@ -180,11 +179,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           PageRouteBuilder(
             pageBuilder: (_, p, q) => SelfieScreen(
               frontCamera: frontCamera,
-              onSuccess: (image) {
+              onCapture: (photo) {
                 // TODO: check if all is smooth.
-                ref.read(setLoadingProfilePicFlag)(true);
-                ref.read(setProfilePic)(image);
-                ref.read(setLoadingProfilePicFlag)(false);
+                ref.read(setLoadingPhotoFlag)(true);
+                ref.read(setPhoto)(photo);
+                ref.read(setLoadingPhotoFlag)(false);
                 ref.read(setProfileSaveFlag)(false);
               },
             ),
@@ -198,7 +197,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   void _apply() {
-    if (ref.read(profilePic) != null) {
+    if (ref.read(photo) != null) {
       // CloudUtility.sendRequest(
       //   endpoint: DigitalOceanDropletAPI.updateProfile,
       //   method: HTTPmethod.,

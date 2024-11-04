@@ -1,25 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class _SelectionNotifier extends StateNotifier<List<String>> {
-  _SelectionNotifier() : super(<String>[]);
+class _ListNotifier<T> extends StateNotifier<List<T>> {
+  _ListNotifier() : super(<T>[]);
 
-  void setState(List<String> entries) => state = entries;
+  void setState(List<T> entries) => state = entries;
 
-  void addEntry(String entry) {
-    if (!state.contains(entry)) state = List<String>.from(state)..add(entry);
+  void addEntry(T entry) {
+    if (!state.contains(entry)) state = List<T>.from(state)..add(entry);
   }
 
-  void removeFirstEntry() => state = List<String>.from(state)..removeAt(0);
+  void removeFirstEntry() => state = List<T>.from(state)..removeAt(0);
 
-  void removeEntry(String entry) => state = List<String>.from(state) //
-    ..remove(entry);
+  void removeEntry(T entry) => state = List<T>.from(state)..remove(entry);
 }
 
-final _langsPod = StateNotifierProvider<_SelectionNotifier, List<String>>(
-  (ref) => _SelectionNotifier(),
+final _langsPod = //
+    StateNotifierProvider<_ListNotifier<String>, List<String>>(
+  (ref) => _ListNotifier<String>(),
 );
-final _interestsPod = StateNotifierProvider<_SelectionNotifier, List<String>>(
-  (ref) => _SelectionNotifier(),
+final _interestsPod =
+    StateNotifierProvider<_ListNotifier<String>, List<String>>(
+  (ref) => _ListNotifier<String>(),
 );
 
 final langs = Provider((ref) => ref.watch(_langsPod));

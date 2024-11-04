@@ -56,7 +56,7 @@ class Shadow {
 }
 
 /// Font family used in the app. Value: 'Mukta'.
-const String appFontFamily = 'Mukta';
+const String fontFamily = 'Mukta';
 
 /// Text size constants for the application.
 class TextSize {

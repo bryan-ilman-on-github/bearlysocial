@@ -1,5 +1,5 @@
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/providers/txt_pod.dart';
+import 'package:bearlysocial/providers/txts_pod.dart';
 import 'package:bearlysocial/views/sections/hero_section.dart';
 import 'package:bearlysocial/views/sections/otp_section.dart';
 import 'package:flutter/material.dart';

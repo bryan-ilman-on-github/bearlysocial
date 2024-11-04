@@ -20,12 +20,12 @@ part 'package:bearlysocial/views/lines/camera_frame.dart';
 
 class SelfieScreen extends ConsumerStatefulWidget {
   final CameraDescription frontCamera;
-  final Function(img_lib.Image?) onSuccess;
+  final Function(img_lib.Image?) onCapture;
 
   const SelfieScreen({
     super.key,
     required this.frontCamera,
-    required this.onSuccess,
+    required this.onCapture,
   });
 
   @override
@@ -164,7 +164,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
               imagePath: renamedFilePath,
             );
 
-            widget.onSuccess(profilePic);
+            widget.onCapture(profilePic);
           }
 
           setState(() {

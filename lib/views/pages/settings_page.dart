@@ -1,8 +1,10 @@
 import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/providers/theme_pod.dart';
 import 'package:bearlysocial/views/buttons/setting_btn.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
+import 'package:day_night_themed_switch/day_night_themed_switch.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +22,23 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
+  final GlobalKey _settingButtonKey = GlobalKey();
+  double? _settingButtonHeight;
+
+  @override
+  void initState() {
+    super.initState();
+    // Wait until the first frame to calculate the height
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final buttonContext = _settingButtonKey.currentContext;
+      if (buttonContext != null) {
+        setState(() {
+          _settingButtonHeight = buttonContext.size?.height;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,7 +51,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SizedBox(
+              height: _settingButtonHeight,
+              child: DayNightSwitch(
+                value: false,
+                onChanged: (_) {},
+              ),
+            ),
+            const SizedBox(
+              height: WhiteSpaceSize.small,
+            ),
             SettingButton(
+              key: _settingButtonKey,
               icon: Icons.translate,
               label: TranslationKey.translationButton.name.tr(),
               callbackFunction: () {},
