@@ -1,20 +1,24 @@
+import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class NavigationBar extends StatelessWidget {
   final Map<String, Map<String, dynamic>> navItems;
-  final int selectedIndex;
-  final Function onTap;
+  final int index;
+  final Function({
+    required int index,
+    required ScrollController scroller,
+  }) onTap;
 
   const NavigationBar({
     super.key,
     required this.navItems,
-    required this.selectedIndex,
+    required this.index,
     required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context context) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -22,34 +26,25 @@ class NavigationBar extends StatelessWidget {
       ),
       child: Row(
         children: navItems.entries.map((entry) {
-          return _navItemBuilder(
-            context: context,
-            label: entry.key,
-            normalIcon: entry.value['normalIcon'],
-            highlightedIcon: entry.value['highlightedIcon'],
-            controller: entry.value['controller'],
-            index: entry.value['index'],
-          );
+          return _navItemBuilder(context: context, entry: entry);
         }).toList(),
       ),
     );
   }
 
   Widget _navItemBuilder({
-    required BuildContext context,
-    required String label,
-    required IconData normalIcon,
-    required IconData highlightedIcon,
-    required ScrollController controller,
-    required int index,
+    required context context,
+    required MapEntry<String, Map<String, dynamic>> entry,
   }) {
+    final isActive = entry.value['index'] == index;
+
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
           onTap(
-            index: index,
-            controller: controller,
+            index: entry.value['index'],
+            scroller: entry.value['scroller'],
           );
         },
         child: SizedBox(
@@ -58,22 +53,21 @@ class NavigationBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                selectedIndex == index ? highlightedIcon : normalIcon,
-                color: selectedIndex == index
+                isActive
+                    ? entry.value['highlightedIcon']
+                    : entry.value['normalIcon'],
+                color: isActive
                     ? Theme.of(context).focusColor
                     : Theme.of(context).textTheme.bodyMedium?.color,
               ),
-              const SizedBox(
-                height: WhiteSpaceSize.verySmall,
-              ),
+              const SizedBox(height: WhiteSpaceSize.verySmall),
               Text(
-                label,
+                entry.key,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: TextSize.verySmall,
-                      fontWeight: selectedIndex == index
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      color: selectedIndex == index
+                      fontWeight:
+                          isActive ? FontWeight.bold : FontWeight.normal,
+                      color: isActive
                           ? Theme.of(context).focusColor
                           : Theme.of(context).textTheme.bodyMedium?.color,
                     ),

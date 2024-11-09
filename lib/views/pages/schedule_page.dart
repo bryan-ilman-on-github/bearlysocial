@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class SchedulePage extends StatefulWidget {
-  final ScrollController controller;
+  final ScrollController scroller;
 
   const SchedulePage({
     super.key,
-    required this.controller,
+    required this.scroller,
   });
 
   @override
@@ -21,7 +21,7 @@ class _SchedulePageState extends State<SchedulePage> {
       child: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: ListView.builder(
-          controller: widget.controller,
+          controller: widget.scroller,
           itemCount: _children.length,
           itemBuilder: (BuildContext context, int index) => _children[index],
         ),

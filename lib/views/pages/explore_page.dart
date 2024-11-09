@@ -1,11 +1,12 @@
+import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:flutter/material.dart';
 
 class ExplorePage extends StatefulWidget {
-  final ScrollController controller;
+  final ScrollController scroller;
 
   const ExplorePage({
     super.key,
-    required this.controller,
+    required this.scroller,
   });
 
   @override
@@ -16,14 +17,14 @@ class _ExplorePageState extends State<ExplorePage> {
   final List<Widget> _children = [];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(AppScope context) {
     return SafeArea(
       child: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: ListView.builder(
-          controller: widget.controller,
+          controller: widget.scroller,
           itemCount: _children.length,
-          itemBuilder: (BuildContext context, int index) => _children[index],
+          itemBuilder: (BuildContext _, int index) => _children[index],
         ),
       ),
     );

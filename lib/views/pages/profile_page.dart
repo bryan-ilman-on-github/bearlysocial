@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
@@ -15,8 +16,8 @@ import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/providers/foci_pod.dart';
 import 'package:bearlysocial/providers/imgs_pod.dart';
-import 'package:bearlysocial/providers/schedule_pod.dart';
 import 'package:bearlysocial/providers/lists_pod.dart';
+import 'package:bearlysocial/providers/schedule_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/form_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
@@ -35,16 +36,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img_lib;
 
-typedef local_db = LocalDatabaseUtility;
-typedef db_key = DatabaseKey;
-typedef txt_sym = TextSymbol;
-
 class ProfilePage extends ConsumerStatefulWidget {
-  final ScrollController controller;
+  final ScrollController scroller;
 
   const ProfilePage({
     super.key,
-    required this.controller,
+    required this.scroller,
   });
 
   @override
@@ -79,44 +76,47 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     await Future.delayed(Duration(seconds: 10)); // TODO: check this!
 
-    String bytes = local_db.retrieveTransaction(key: db_key.photo.name);
+    String bytes =
+        LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.photo.name);
 
     if (bytes.isNotEmpty) {
       ref.read(setPhoto)(img_lib.decodeImage(base64Decode(bytes)));
     }
 
-    _firstNameController.text = local_db.retrieveTransaction(
-      key: db_key.first_name.name,
+    _firstNameController.text = LocalDatabaseUtility.retrieveTransaction(
+      key: DatabaseKey.first_name.name,
     );
-    _lastNameController.text = local_db.retrieveTransaction(
-      key: db_key.last_name.name,
+    _lastNameController.text = LocalDatabaseUtility.retrieveTransaction(
+      key: DatabaseKey.last_name.name,
     );
 
     // TODO: check if code suits.
     ref.read(setInterests)(
-      jsonDecode(local_db.retrieveTransaction(key: db_key.interests.name))
+      jsonDecode(LocalDatabaseUtility.retrieveTransaction(
+              key: DatabaseKey.interests.name))
           .cast<String>(),
     );
     ref.read(setLangs)(
-      jsonDecode(local_db.retrieveTransaction(key: db_key.langs.name))
+      jsonDecode(LocalDatabaseUtility.retrieveTransaction(
+              key: DatabaseKey.langs.name))
           .cast<String>(),
     );
 
-    _interestController.text = txt_sym.emptyString;
-    _langController.text = txt_sym.emptyString;
+    _interestController.text = TextSymbol.emptyString;
+    _langController.text = TextSymbol.emptyString;
 
-    _instaHandleController.text = local_db.retrieveTransaction(
-      key: db_key.insta_handle.name,
+    _instaHandleController.text = LocalDatabaseUtility.retrieveTransaction(
+      key: DatabaseKey.insta_handle.name,
     );
-    _facebookHandleController.text = local_db.retrieveTransaction(
-      key: db_key.fb_handle.name,
+    _facebookHandleController.text = LocalDatabaseUtility.retrieveTransaction(
+      key: DatabaseKey.fb_handle.name,
     );
-    _linkedinHandleController.text = local_db.retrieveTransaction(
-      key: db_key.linkedin_handle.name,
+    _linkedinHandleController.text = LocalDatabaseUtility.retrieveTransaction(
+      key: DatabaseKey.linkedin_handle.name,
     );
 
     ref.read(setSchedule)(SplayTreeMap.from(jsonDecode(
-      local_db.retrieveTransaction(key: db_key.schedule.name),
+      LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.schedule.name),
     )));
 
     ref.read(setLoadingPhotoFlag)(false);
@@ -133,7 +133,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       if (ref.read(interests).length >= 4) ref.read(removeFirstInterest)();
 
       ref.read(addInterest)(_interestController.text);
-      _interestController.text = txt_sym.emptyString;
+      _interestController.text = TextSymbol.emptyString;
 
       ref.read(setProfileSaveFlag)(false);
     }
@@ -144,7 +144,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       if (ref.read(langs).length >= 4) ref.read(removeFirstLang)();
 
       ref.read(addLang)(_langController.text);
-      _langController.text = txt_sym.emptyString;
+      _langController.text = TextSymbol.emptyString;
 
       ref.read(setProfileSaveFlag)(false);
     }
@@ -179,10 +179,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           PageRouteBuilder(
             pageBuilder: (_, p, q) => SelfieScreen(
               frontCamera: frontCamera,
-              onCapture: (photo) {
+              onCapture: (optionalPhoto) {
                 // TODO: check if all is smooth.
                 ref.read(setLoadingPhotoFlag)(true);
-                ref.read(setPhoto)(photo);
+                ref.read(setPhoto)(optionalPhoto);
                 ref.read(setLoadingPhotoFlag)(false);
                 ref.read(setProfileSaveFlag)(false);
               },
@@ -244,13 +244,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context context) {
     return SafeArea(
       child: Container(
         // TODO: check if color is necessary.
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SingleChildScrollView(
-          controller: widget.controller,
+          controller: widget.scroller,
           padding: const EdgeInsets.symmetric(horizontal: PaddingSize.medium),
           child: Column(
             children: [

@@ -10,11 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
-  final ScrollController controller;
+  final ScrollController scroller;
 
   const SettingsPage({
     super.key,
-    required this.controller,
+    required this.scroller,
   });
 
   @override
@@ -43,7 +43,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SingleChildScrollView(
-        controller: widget.controller,
+        controller: widget.scroller,
         padding: const EdgeInsets.all(
           PaddingSize.medium,
         ),
@@ -52,7 +52,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              height: _settingButtonHeight,
+              height: (_settingButtonHeight ?? 0) / 1.25, // arbitrary
               child: DayNightSwitch(
                 value: false,
                 onChanged: (_) {},

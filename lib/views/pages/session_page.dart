@@ -1,3 +1,4 @@
+import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/views/bars/nav_bar.dart' as app_nav_bar;
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/views/pages/explore_page.dart';
@@ -11,32 +12,30 @@ class SessionPage extends StatefulWidget {
   const SessionPage({super.key});
 
   @override
-  State<SessionPage> createState() => _SessionPage();
+  State<SessionPage> createState() => _SessionPageState();
 }
 
-class _SessionPage extends State<SessionPage> {
+class _SessionPageState extends State<SessionPage> {
   Map<String, Map<String, dynamic>> _navItems = {};
-  int _selectedIndex = 0;
+  int _index = 0;
 
   List<Widget> _pages = [];
 
-  late ScrollController _controller;
+  late ScrollController _scroller;
   bool _showingScrollButton = false;
 
-  ScrollController _createController() {
-    final ScrollController scrollController = ScrollController();
+  ScrollController _createScrollController() {
+    final scroller = ScrollController();
 
-    scrollController.addListener(() {
-      setState(() {
-        _showingScrollButton = scrollController.offset > 0.0;
-      });
+    scroller.addListener(() {
+      setState(() => _showingScrollButton = scroller.offset > 0.0);
     });
 
-    return scrollController;
+    return scroller;
   }
 
   void _scrollToTop() {
-    _controller.animateTo(
+    _scroller.animateTo(
       0.0,
       duration: const Duration(milliseconds: AnimationDuration.medium),
       curve: Curves.easeInOut,
@@ -45,32 +44,32 @@ class _SessionPage extends State<SessionPage> {
 
   void _onTap({
     required int index,
-    required ScrollController controller,
+    required ScrollController scroller,
   }) {
     setState(() {
-      _selectedIndex = index;
-      _controller = controller;
+      _index = index;
+      _scroller = scroller;
 
-      _showingScrollButton = _controller.offset > 0.0;
+      _showingScrollButton = _scroller.offset > 0.0;
     });
   }
 
   List<Widget> _initPages() {
     return <Widget>[
       ExplorePage(
-        controller: _createController(),
+        scroller: _createScrollController(),
       ),
       FavoritesPage(
-        controller: _createController(),
+        scroller: _createScrollController(),
       ),
       SchedulePage(
-        controller: _createController(),
+        scroller: _createScrollController(),
       ),
       ProfilePage(
-        controller: _createController(),
+        scroller: _createScrollController(),
       ),
       SettingsPage(
-        controller: _createController(),
+        scroller: _createScrollController(),
       ),
     ];
   }
@@ -80,48 +79,49 @@ class _SessionPage extends State<SessionPage> {
     super.initState();
 
     _pages = _initPages();
+
+    const normalIcon = 'normalIcon';
+    const highlightedIcon = 'highlightedIcon';
+
     _navItems = {
       'Explore': {
-        'normalIcon': Icons.explore_outlined,
-        'highlightedIcon': Icons.explore,
+        normalIcon: Icons.explore_outlined,
+        highlightedIcon: Icons.explore,
       },
       'Favorites': {
-        'normalIcon': Icons.favorite_border,
-        'highlightedIcon': Icons.favorite,
+        normalIcon: Icons.favorite_border,
+        highlightedIcon: Icons.favorite,
       },
       'Schedule': {
-        'normalIcon': Icons.calendar_today_outlined,
-        'highlightedIcon': Icons.calendar_today,
+        normalIcon: Icons.calendar_today_outlined,
+        highlightedIcon: Icons.calendar_today,
       },
       'Profile': {
-        'normalIcon': Icons.person_outlined,
-        'highlightedIcon': Icons.person,
+        normalIcon: Icons.person_outlined,
+        highlightedIcon: Icons.person,
       },
       'Settings': {
-        'normalIcon': Icons.settings_outlined,
-        'highlightedIcon': Icons.settings,
+        normalIcon: Icons.settings_outlined,
+        highlightedIcon: Icons.settings,
       },
     }.map((key, value) {
-      final int index = _pages.indexWhere(
+      final index = _pages.indexWhere(
         (page) => page.runtimeType.toString() == '${key}Page',
       );
 
       return MapEntry(key, {
         ...value,
-        'controller': (_pages[index] as dynamic).controller,
+        'scroller': (_pages[index] as dynamic).scroller,
         'index': index,
       });
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _index, children: _pages),
       floatingActionButton: _showingScrollButton
           ? FloatingActionButton(
               shape: const CircleBorder(),
@@ -137,7 +137,7 @@ class _SessionPage extends State<SessionPage> {
           : null,
       bottomNavigationBar: app_nav_bar.NavigationBar(
         navItems: _navItems,
-        selectedIndex: _selectedIndex,
+        index: _index,
         onTap: _onTap,
       ),
     );

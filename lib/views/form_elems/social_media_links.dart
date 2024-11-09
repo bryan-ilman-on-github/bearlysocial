@@ -8,8 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-typedef local_db = LocalDatabaseUtility;
-
 class SocialMediaLink extends StatelessWidget {
   final TextEditingController controller;
   final SocialMedia platform;
@@ -24,10 +22,12 @@ class SocialMediaLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    controller.text =
-        handle ?? local_db.retrieveTransaction(key: '${platform.name}_handle');
+    controller.text = handle ??
+        LocalDatabaseUtility.retrieveTransaction(
+          key: '${platform.name}_handle',
+        );
 
-    dynamic peerVerificationCount = local_db.retrieveTransaction(
+    dynamic peerVerificationCount = LocalDatabaseUtility.retrieveTransaction(
       key: '${platform.name}_peer_verification_count',
     );
 
