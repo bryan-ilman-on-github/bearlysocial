@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
@@ -76,11 +75,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     await Future.delayed(Duration(seconds: 10)); // TODO: check this!
 
-    String bytes =
+    String photoBytes =
         LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.photo.name);
 
-    if (bytes.isNotEmpty) {
-      ref.read(setPhoto)(img_lib.decodeImage(base64Decode(bytes)));
+    if (photoBytes.isNotEmpty) {
+      ref.read(setPhoto)(img_lib.decodeImage(base64Decode(photoBytes)));
     }
 
     _firstNameController.text = LocalDatabaseUtility.retrieveTransaction(
@@ -90,16 +89,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: DatabaseKey.last_name.name,
     );
 
-    // TODO: check if code suits.
     ref.read(setInterests)(
       jsonDecode(LocalDatabaseUtility.retrieveTransaction(
-              key: DatabaseKey.interests.name))
-          .cast<String>(),
+        key: DatabaseKey.interests.name,
+      )).cast<String>(),
     );
     ref.read(setLangs)(
       jsonDecode(LocalDatabaseUtility.retrieveTransaction(
-              key: DatabaseKey.langs.name))
-          .cast<String>(),
+        key: DatabaseKey.langs.name,
+      )).cast<String>(),
     );
 
     _interestController.text = TextSymbol.emptyString;
@@ -122,8 +120,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ref.read(setLoadingPhotoFlag)(false);
     ref.read(setProfileSaveFlag)(true);
 
-    _canResetChanges = false;
-    _canApplyChanges = false;
+    _canResetChanges = true;
+    _canApplyChanges = true;
   }
 
   final _allInterests = FormUtility.allInterests;
@@ -160,10 +158,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ref.read(setProfileSaveFlag)(false);
   }
 
-  Future<CameraDescription?> _getFrontCam() async {
-    final bool camAllowed = await UserPermissionUtility.cameraPermission;
+  Future<CameraDescription?> _getFrontCamera() async {
+    final bool cameraAllowed = await UserPermissionUtility.cameraPermission;
 
-    if (camAllowed) {
+    if (cameraAllowed) {
       return (await availableCameras()).firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.front,
       );
@@ -173,7 +171,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   void _navToSelfieScreen() {
-    _getFrontCam().then((frontCamera) {
+    _getFrontCamera().then((frontCamera) {
       if (frontCamera != null) {
         Navigator.of(context).push(
           PageRouteBuilder(
@@ -244,7 +242,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   @override
-  Widget build(context context) {
+  Widget build(context) {
     return SafeArea(
       child: Container(
         // TODO: check if color is necessary.
@@ -374,11 +372,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       horizontalPadding: PaddingSize.veryLarge,
                       verticalPadding: PaddingSize.small,
                       callbackFunction: _canResetChanges
-                          ? null
-                          : () {
+                          ? () {
                               _canResetChanges = false;
                               _syncWithDatabase();
-                            },
+                            }
+                          : null,
                       buttonColor: Colors.transparent,
                       borderColor: Colors.transparent,
                       borderRadius: BorderRadius.circular(CurvatureSize.large),
@@ -394,11 +392,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       horizontalPadding: PaddingSize.veryLarge,
                       verticalPadding: PaddingSize.small,
                       callbackFunction: _canApplyChanges
-                          ? null
-                          : () {
+                          ? () {
                               _canApplyChanges = false;
                               _syncWithDatabase();
-                            },
+                            }
+                          : null,
                       borderRadius: BorderRadius.circular(CurvatureSize.large),
                       shadow: Shadow.medium,
                       child: Text(

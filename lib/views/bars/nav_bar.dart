@@ -1,9 +1,8 @@
-import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class NavigationBar extends StatelessWidget {
-  final Map<String, Map<String, dynamic>> navItems;
+  final Map<String, Map<String, dynamic>> routes;
   final int index;
   final Function({
     required int index,
@@ -12,30 +11,30 @@ class NavigationBar extends StatelessWidget {
 
   const NavigationBar({
     super.key,
-    required this.navItems,
+    required this.routes,
     required this.index,
     required this.onTap,
   });
 
   @override
-  Widget build(context context) {
+  Widget build(context) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [Shadow.small],
       ),
       child: Row(
-        children: navItems.entries.map((entry) {
-          return _navItemBuilder(context: context, entry: entry);
+        children: routes.entries.map((entry) {
+          return _navButton(context, entry);
         }).toList(),
       ),
     );
   }
 
-  Widget _navItemBuilder({
-    required context context,
-    required MapEntry<String, Map<String, dynamic>> entry,
-  }) {
+  Widget _navButton(
+    BuildContext buildContext,
+    MapEntry<String, Map<String, dynamic>> entry,
+  ) {
     final isActive = entry.value['index'] == index;
 
     return Expanded(
@@ -57,19 +56,19 @@ class NavigationBar extends StatelessWidget {
                     ? entry.value['highlightedIcon']
                     : entry.value['normalIcon'],
                 color: isActive
-                    ? Theme.of(context).focusColor
-                    : Theme.of(context).textTheme.bodyMedium?.color,
+                    ? Theme.of(buildContext).focusColor
+                    : Theme.of(buildContext).textTheme.bodyMedium?.color,
               ),
               const SizedBox(height: WhiteSpaceSize.verySmall),
               Text(
                 entry.key,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: Theme.of(buildContext).textTheme.bodyMedium?.copyWith(
                       fontSize: TextSize.verySmall,
                       fontWeight:
                           isActive ? FontWeight.bold : FontWeight.normal,
                       color: isActive
-                          ? Theme.of(context).focusColor
-                          : Theme.of(context).textTheme.bodyMedium?.color,
+                          ? Theme.of(buildContext).focusColor
+                          : Theme.of(buildContext).textTheme.bodyMedium?.color,
                     ),
               ),
             ],

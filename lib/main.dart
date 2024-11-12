@@ -1,4 +1,3 @@
-import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/providers/theme_pod.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
@@ -24,7 +23,7 @@ class AppSetup extends StatelessWidget {
   const AppSetup({super.key});
 
   @override
-  Widget build(AppScope context) {
+  Widget build(context) {
     return ProviderScope(
       child: EasyLocalization(
         supportedLocales: const [
@@ -60,7 +59,7 @@ class _AppEntryState extends ConsumerState<AppEntry> {
   }
 
   @override
-  Widget build(AppScope context) {
+  Widget build(context) {
     return MaterialApp(
       title: 'BearlySocial',
       theme: ref.watch(theme),

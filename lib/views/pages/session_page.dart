@@ -1,4 +1,3 @@
-import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/views/bars/nav_bar.dart' as app_nav_bar;
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/views/pages/explore_page.dart';
@@ -16,7 +15,7 @@ class SessionPage extends StatefulWidget {
 }
 
 class _SessionPageState extends State<SessionPage> {
-  Map<String, Map<String, dynamic>> _navItems = {};
+  Map<String, Map<String, dynamic>> _routes = {};
   int _index = 0;
 
   List<Widget> _pages = [];
@@ -83,7 +82,7 @@ class _SessionPageState extends State<SessionPage> {
     const normalIcon = 'normalIcon';
     const highlightedIcon = 'highlightedIcon';
 
-    _navItems = {
+    _routes = {
       'Explore': {
         normalIcon: Icons.explore_outlined,
         highlightedIcon: Icons.explore,
@@ -118,7 +117,7 @@ class _SessionPageState extends State<SessionPage> {
   }
 
   @override
-  Widget build(context context) {
+  Widget build(context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: IndexedStack(index: _index, children: _pages),
@@ -136,7 +135,7 @@ class _SessionPageState extends State<SessionPage> {
             )
           : null,
       bottomNavigationBar: app_nav_bar.NavigationBar(
-        navItems: _navItems,
+        routes: _routes,
         index: _index,
         onTap: _onTap,
       ),

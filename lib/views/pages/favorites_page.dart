@@ -1,4 +1,3 @@
-import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:flutter/material.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -17,7 +16,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   final List<Widget> _children = [];
 
   @override
-  Widget build(AppScope context) {
+  Widget build(context) {
     return SafeArea(
       child: Container(
         color: Theme.of(context).scaffoldBackgroundColor,

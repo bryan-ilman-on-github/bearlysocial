@@ -1,4 +1,3 @@
-import 'package:bearlysocial/aliases/app_scope.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/txts_pod.dart';
 import 'package:bearlysocial/views/sections/hero_section.dart';
@@ -15,7 +14,7 @@ class AuthPage extends ConsumerStatefulWidget {
 
 class _AuthPageState extends ConsumerState<AuthPage> {
   @override
-  Widget build(context context) {
+  Widget build(context) {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: PaddingSize.large),
