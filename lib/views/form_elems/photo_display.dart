@@ -1,16 +1,16 @@
-import 'package:bearlysocial/views/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:bearlysocial/providers/imgs_pod.dart';
-import 'package:bearlysocial/utils/selfie_util.dart';
+import 'package:bearlysocial/utils/cam_util.dart';
+import 'package:bearlysocial/views/lines/progress_spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfilePictureCanvas extends ConsumerWidget {
-  const ProfilePictureCanvas({super.key});
+class PhotoDisplay extends ConsumerWidget {
+  const PhotoDisplay({super.key});
 
   @override
-  Widget build(BuildContext context, var ref) {
+  Widget build(context, ref) {
     return Container(
       width: SideSize.large,
       height: SideSize.large,
@@ -26,7 +26,7 @@ class ProfilePictureCanvas extends ConsumerWidget {
       child: Center(
         child: ref.watch(isLoadingPhoto)
             ? const ProgressSpinner()
-            : SelfieUtility.buildCircularImage(ref.read(photo)),
+            : CameraUtility.displayPhoto(ref.read(photo)),
       ),
     );
   }

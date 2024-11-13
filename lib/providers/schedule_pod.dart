@@ -122,7 +122,7 @@ final setSchedule = Provider((ref) {
   return ref.read(_scheduleNotifierProvider.notifier).setState;
 });
 
-final addTimeSlotColl = Provider((ref) {
+final addTimeSlots = Provider((ref) {
   return ref.read(_scheduleNotifierProvider.notifier).addTimeSlotCollection;
 });
 

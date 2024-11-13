@@ -1,5 +1,3 @@
-// ignore_for_file: camel_case_types
-
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
@@ -7,7 +5,6 @@ import 'dart:convert';
 import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/db_key.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/native_lang_name.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
@@ -22,7 +19,7 @@ import 'package:bearlysocial/utils/form_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/user_permission_util.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
-import 'package:bearlysocial/views/form_elems/profile_pic_canvas.dart';
+import 'package:bearlysocial/views/form_elems/photo_display.dart';
 import 'package:bearlysocial/views/form_elems/schedule.dart';
 import 'package:bearlysocial/views/form_elems/selector.dart';
 import 'package:bearlysocial/views/form_elems/social_media_links.dart';
@@ -244,171 +241,165 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(context) {
     return SafeArea(
-      child: Container(
-        // TODO: check if color is necessary.
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: SingleChildScrollView(
-          controller: widget.scroller,
-          padding: const EdgeInsets.symmetric(horizontal: PaddingSize.medium),
-          child: Column(
-            children: [
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: WarningMessage(),
+      child: SingleChildScrollView(
+        controller: widget.scroller,
+        padding: const EdgeInsets.symmetric(horizontal: PaddingSize.medium),
+        child: Column(
+          children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: WarningMessage(),
+            ),
+            const SizedBox(height: WhiteSpaceSize.verySmall),
+            const PhotoDisplay(),
+            const SizedBox(height: WhiteSpaceSize.small),
+            UnconstrainedBox(
+              child: SplashButton(
+                horizontalPadding: PaddingSize.small,
+                verticalPadding: PaddingSize.verySmall,
+                callbackFunction: _navToSelfieScreen,
+                buttonColor: Theme.of(context).highlightColor,
+                borderColor: Theme.of(context).focusColor,
+                borderRadius: BorderRadius.circular(CurvatureSize.infinity),
+                child: Text(
+                  'Update Photo',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).focusColor,
+                      ),
+                ),
               ),
-              const SizedBox(height: WhiteSpaceSize.verySmall),
-              const ProfilePictureCanvas(),
-              const SizedBox(height: WhiteSpaceSize.small),
-              // Profile Picture Update Button
-              UnconstrainedBox(
+            ),
+            const SizedBox(height: WhiteSpaceSize.medium),
+            UnderlinedTextField(
+              label: 'First Name',
+              controller: _firstNameController,
+              focusNode: _firstNameFocusNode,
+              focusPod: firstNameFocus,
+            ),
+            const SizedBox(height: WhiteSpaceSize.medium),
+            UnderlinedTextField(
+              label: 'Last Name',
+              controller: _lastNameController,
+              focusNode: _lastNameFocusNode,
+              focusPod: lastNameFocus,
+            ),
+            const SizedBox(height: WhiteSpaceSize.large),
+            Selector(
+              hint: 'Interest(s)',
+              menu: FormUtility.buildDropdownMenu(entries: _allInterests),
+              controller: _interestController,
+              entries: ref.watch(interests),
+              addEntry: _addInterest,
+              removeEntry: _removeInterest,
+            ),
+            const SizedBox(height: WhiteSpaceSize.large),
+            Selector(
+              hint: 'Language(s)',
+              menu: FormUtility.buildDropdownMenu(
+                entries: NativeLanguageName.map,
+              ),
+              controller: _langController,
+              entries: ref.watch(langs),
+              addEntry: _addLang,
+              removeEntry: _removeLang,
+            ),
+            const SizedBox(height: WhiteSpaceSize.medium),
+            SocialMediaLink(
+              platform: SocialMedia.instagram,
+              controller: _instaHandleController,
+            ),
+            const SizedBox(height: WhiteSpaceSize.medium),
+            SocialMediaLink(
+              platform: SocialMedia.facebook,
+              controller: _facebookHandleController,
+            ),
+            const SizedBox(height: WhiteSpaceSize.medium),
+            SocialMediaLink(
+              platform: SocialMedia.linkedin,
+              controller: _linkedinHandleController,
+            ),
+            const SizedBox(height: WhiteSpaceSize.large),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'When is your free time?',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: WhiteSpaceSize.verySmall),
+            const Schedule(),
+            const SizedBox(height: WhiteSpaceSize.verySmall),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: UnconstrainedBox(
                 child: SplashButton(
                   horizontalPadding: PaddingSize.small,
                   verticalPadding: PaddingSize.verySmall,
-                  callbackFunction: _navToSelfieScreen,
+                  callbackFunction: () async {
+                    List<DateTime>? dateTimeRange =
+                        await FormUtility.appDateTimeRangePicker(
+                      context: context,
+                    );
+
+                    ref.read(addTimeSlots)(dateTimeRange);
+                  },
                   buttonColor: Theme.of(context).highlightColor,
                   borderColor: Theme.of(context).focusColor,
                   borderRadius: BorderRadius.circular(CurvatureSize.infinity),
                   child: Text(
-                    'Update Profile Picture',
+                    'Select Time',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).focusColor,
                         ),
                   ),
                 ),
               ),
-              const SizedBox(height: WhiteSpaceSize.medium),
-              UnderlinedTextField(
-                label: 'First Name',
-                controller: _firstNameController,
-                focusNode: _firstNameFocusNode,
-                focusPod: firstNameFocus,
-              ),
-              const SizedBox(height: WhiteSpaceSize.medium),
-              UnderlinedTextField(
-                label: 'Last Name',
-                controller: _lastNameController,
-                focusNode: _lastNameFocusNode,
-                focusPod: lastNameFocus,
-              ),
-              const SizedBox(height: WhiteSpaceSize.large),
-              Selector(
-                hint: 'Interest(s)',
-                menu: FormUtility.buildDropdownMenu(entries: _allInterests),
-                controller: _interestController,
-                entries: ref.watch(interests),
-                addEntry: _addInterest,
-                removeEntry: _removeInterest,
-              ),
-              const SizedBox(height: WhiteSpaceSize.large),
-              Selector(
-                hint: 'Language(s)',
-                menu: FormUtility.buildDropdownMenu(
-                  entries: NativeLanguageName.map,
-                ),
-                controller: _langController,
-                entries: ref.watch(langs),
-                addEntry: _addLang,
-                removeEntry: _removeLang,
-              ),
-              const SizedBox(height: WhiteSpaceSize.medium),
-              SocialMediaLink(
-                platform: SocialMedia.instagram,
-                controller: _instaHandleController,
-              ),
-              const SizedBox(height: WhiteSpaceSize.medium),
-              SocialMediaLink(
-                platform: SocialMedia.facebook,
-                controller: _facebookHandleController,
-              ),
-              const SizedBox(height: WhiteSpaceSize.medium),
-              SocialMediaLink(
-                platform: SocialMedia.linkedin,
-                controller: _linkedinHandleController,
-              ),
-              const SizedBox(height: WhiteSpaceSize.large),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'When is your free time?',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-              const SizedBox(height: WhiteSpaceSize.verySmall),
-              const Schedule(),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: UnconstrainedBox(
-                  child: SplashButton(
-                    horizontalPadding: PaddingSize.small,
-                    verticalPadding: PaddingSize.verySmall,
-                    callbackFunction: () async {
-                      List<DateTime>? dateTimeRange =
-                          await FormUtility.appDateTimeRangePicker(
-                        context: context,
-                      );
-
-                      // TODO: rewrite.
-                      ref.read(addTimeSlotColl)(dateTimeRange);
-                    },
-                    buttonColor: Theme.of(context).highlightColor,
-                    borderColor: Theme.of(context).focusColor,
-                    borderRadius: BorderRadius.circular(CurvatureSize.infinity),
+            ),
+            const SizedBox(height: WhiteSpaceSize.large),
+            Padding(
+              padding: const EdgeInsets.only(bottom: PaddingSize.medium),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SplashButton(
+                    horizontalPadding: PaddingSize.veryLarge,
+                    verticalPadding: PaddingSize.small,
+                    callbackFunction: _canResetChanges
+                        ? () {
+                            _canResetChanges = false;
+                            _syncWithDatabase();
+                          }
+                        : null,
+                    buttonColor: Colors.transparent,
+                    borderColor: Colors.transparent,
+                    borderRadius: BorderRadius.circular(CurvatureSize.large),
                     child: Text(
-                      'Add Slot(s)',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      TranslationKey.resetButton.name.tr(),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: Theme.of(context).focusColor,
                           ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: WhiteSpaceSize.large),
-              Padding(
-                padding: const EdgeInsets.only(bottom: PaddingSize.medium),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    SplashButton(
-                      horizontalPadding: PaddingSize.veryLarge,
-                      verticalPadding: PaddingSize.small,
-                      callbackFunction: _canResetChanges
-                          ? () {
-                              _canResetChanges = false;
-                              _syncWithDatabase();
-                            }
-                          : null,
-                      buttonColor: Colors.transparent,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(CurvatureSize.large),
-                      child: Text(
-                        TranslationKey.resetButton.name.tr(),
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).focusColor,
-                                ),
-                      ),
+                  SplashButton(
+                    horizontalPadding: PaddingSize.veryLarge,
+                    verticalPadding: PaddingSize.small,
+                    callbackFunction: _canApplyChanges
+                        ? () {
+                            _canApplyChanges = false;
+                            _syncWithDatabase();
+                          }
+                        : null,
+                    borderRadius: BorderRadius.circular(CurvatureSize.large),
+                    shadow: Shadow.medium,
+                    child: Text(
+                      TranslationKey.applyButton.name.tr(),
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    SplashButton(
-                      horizontalPadding: PaddingSize.veryLarge,
-                      verticalPadding: PaddingSize.small,
-                      callbackFunction: _canApplyChanges
-                          ? () {
-                              _canApplyChanges = false;
-                              _syncWithDatabase();
-                            }
-                          : null,
-                      borderRadius: BorderRadius.circular(CurvatureSize.large),
-                      shadow: Shadow.medium,
-                      child: Text(
-                        TranslationKey.applyButton.name.tr(),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
-import 'package:isar/isar.dart';
 
 final ref = ProviderContainer();
 
@@ -19,7 +18,7 @@ void _updateScreenSize() {
   screenHeight = ref.read(screenSize).height;
 }
 
-class SelfieUtility {
+class CameraUtility {
   static double calculateCamFrameSize() {
     _updateScreenSize();
 
@@ -32,14 +31,14 @@ class SelfieUtility {
   }
 
   static Future<Face?> detectFace({
+    required CameraImage camImage,
     required int sensorOrientation,
-    required CameraImage image,
     required FaceDetector faceDetector,
   }) async {
     final InputImage preppedImage = InputImage.fromBytes(
-      bytes: _extractBytes(image),
-      metadata: _buildImageMetadata(
-        image: image,
+      bytes: _extractBytes(camImage),
+      metadata: _generateMetadata(
+        camImage: camImage,
         sensorOrientation: sensorOrientation,
       ),
     );
@@ -47,45 +46,48 @@ class SelfieUtility {
       preppedImage,
     );
 
-    return findCenteredFace(
+    return _findCenteredFace(
       faces: detectedFaces,
-      image: image,
+      camImageSize: Size(
+        camImage.width.toDouble(),
+        camImage.height.toDouble(),
+      ),
     );
   }
 
-  static Uint8List _extractBytes(CameraImage image) {
+  static Uint8List _extractBytes(CameraImage camImage) {
     final WriteBuffer bytesInBuffer = WriteBuffer();
 
-    for (final plane in image.planes) {
+    for (final plane in camImage.planes) {
       bytesInBuffer.putUint8List(plane.bytes);
     }
 
     return bytesInBuffer.done().buffer.asUint8List();
   }
 
-  static InputImageMetadata _buildImageMetadata({
-    required CameraImage image,
+  static InputImageMetadata _generateMetadata({
+    required CameraImage camImage,
     required int sensorOrientation,
   }) {
-    final size = Size(image.width.toDouble(), image.height.toDouble());
+    final size = Size(camImage.width.toDouble(), camImage.height.toDouble());
 
     final rotation = InputImageRotationValue.fromRawValue(sensorOrientation) ??
         InputImageRotation.rotation0deg;
 
-    final format = InputImageFormatValue.fromRawValue(image.format.raw) ??
+    final format = InputImageFormatValue.fromRawValue(camImage.format.raw) ??
         InputImageFormat.nv21;
 
     return InputImageMetadata(
       size: size,
       rotation: rotation,
       format: format,
-      bytesPerRow: image.planes[0].bytesPerRow,
+      bytesPerRow: camImage.planes[0].bytesPerRow,
     );
   }
 
-  static Face? findCenteredFace({
+  static Face? _findCenteredFace({
     required List<Face> faces,
-    required CameraImage image,
+    required Size camImageSize,
   }) {
     final screenWidth = ref.read(screenSize).width;
     final screenHeight = ref.read(screenSize).height;
@@ -93,12 +95,9 @@ class SelfieUtility {
     final screenCenter = Offset(screenWidth / 2, screenHeight / 2);
 
     for (final Face face in faces) {
-      final Rect facialBoundingBox = normalizeBoundingBox(
+      final Rect facialBoundingBox = _normalizeBoundingBox(
         rect: face.boundingBox,
-        imageSize: Size(
-          image.width.toDouble(),
-          image.height.toDouble(),
-        ),
+        camImageSize: camImageSize,
       );
 
       final Offset faceCenter = Offset(
@@ -106,13 +105,13 @@ class SelfieUtility {
         facialBoundingBox.top + facialBoundingBox.height / 2,
       );
 
-      final bool faceIsCentered = validateFacePosition(
+      final bool isFaceCentered = _validatePose(
         screenCenter: screenCenter,
         faceCenter: faceCenter,
         face: face,
       );
 
-      if (faceIsCentered) {
+      if (isFaceCentered) {
         return Face(
           trackingId: face.trackingId,
           boundingBox: facialBoundingBox,
@@ -126,17 +125,17 @@ class SelfieUtility {
     return null;
   }
 
-  static Rect normalizeBoundingBox({
+  static Rect _normalizeBoundingBox({
     required Rect rect,
-    required Size imageSize,
+    required Size camImageSize,
   }) {
-    final double scaleX = screenWidth / imageSize.height;
-    final double scaleY = screenHeight / imageSize.width;
+    final double scaleX = screenWidth / camImageSize.height;
+    final double scaleY = screenHeight / camImageSize.width;
 
     final double scale = scaleX > scaleY ? scaleX : scaleY;
     final Offset offset = Offset(
-      (screenWidth - imageSize.height * scale) / 2,
-      (screenHeight - imageSize.width * scale) / 2,
+      (screenWidth - camImageSize.height * scale) / 2,
+      (screenHeight - camImageSize.width * scale) / 2,
     );
 
     return Rect.fromLTWH(
@@ -147,13 +146,13 @@ class SelfieUtility {
     );
   }
 
-  static bool validateFacePosition({
+  static bool _validatePose({
     required Offset screenCenter,
     required Offset faceCenter,
     required Face face,
   }) {
-    const double coordinateDeviation = 40.0;
-    const double poseInaccuracy = 20.0;
+    const double maxCoordinateDeviation = 40.0;
+    const double maxPoseInaccuracy = 20.0;
 
     final double headTilt = face.headEulerAngleX ?? double.infinity;
     final double headTurn = face.headEulerAngleY ?? double.infinity;
@@ -162,62 +161,55 @@ class SelfieUtility {
     final double dxDifference = (screenCenter.dx - faceCenter.dx).abs();
     final double dyDifference = (screenCenter.dy - faceCenter.dy).abs();
 
-    return dxDifference <= coordinateDeviation &&
-        dyDifference <= coordinateDeviation &&
-        headTilt.abs() <= poseInaccuracy &&
-        headTurn.abs() <= poseInaccuracy &&
-        headRotation.abs() <= poseInaccuracy;
+    return dxDifference <= maxCoordinateDeviation &&
+        dyDifference <= maxCoordinateDeviation &&
+        headTilt.abs() <= maxPoseInaccuracy &&
+        headTurn.abs() <= maxPoseInaccuracy &&
+        headRotation.abs() <= maxPoseInaccuracy;
   }
 
-  static Future<img_lib.Image?> buildProfilePic({
-    required String imagePath,
+  static Future<img_lib.Image?> formatPhoto({
+    required String photoPath,
   }) async {
-    final img_lib.Image? image = img_lib.decodeImage(
-      await File(imagePath).readAsBytes(),
-    );
+    final originalPhoto =
+        img_lib.decodeImage(await File(photoPath).readAsBytes());
 
-    if (image != null) {
-      final int newWidth = screenWidth.toInt();
-      final int newHeight = screenHeight.toInt();
-      final img_lib.Image stretchedImage = img_lib.copyResize(
-        image,
-        width: newWidth,
-        height: newHeight,
+    if (originalPhoto != null) {
+      final stretchedPhoto = img_lib.copyResize(
+        originalPhoto,
+        width: screenWidth.toInt(),
+        height: screenHeight.toInt(),
       );
 
-      final int size = calculateCamFrameSize().toInt();
-      final int offsetX = (stretchedImage.width - size) ~/ 2;
-      final int offsetY = (stretchedImage.height - size) ~/ 2;
+      final int targetSize = calculateCamFrameSize().toInt();
+      final int offsetX = (stretchedPhoto.width - targetSize) ~/ 2;
+      final int offsetY = (stretchedPhoto.height - targetSize) ~/ 2;
 
-      final img_lib.Image croppedImage = img_lib.copyCrop(
-        stretchedImage,
+      final croppedPhoto = img_lib.copyCrop(
+        stretchedPhoto,
         x: offsetX,
         y: offsetY,
-        width: size,
-        height: size,
+        width: targetSize,
+        height: targetSize,
       );
 
-      img_lib.Image flippedImage = img_lib.flip(
-        croppedImage,
+      img_lib.Image flippedPhoto = img_lib.flip(
+        croppedPhoto,
         direction: img_lib.FlipDirection.horizontal,
       );
 
-      return flippedImage;
+      return flippedPhoto;
     } else {
-      return image;
+      return originalPhoto;
     }
   }
 
-  static Widget buildCircularImage(img_lib.Image? img) {
-    if (img == null) {
-      return const Icon(
-        Icons.no_photography_outlined,
-      );
+  static Widget displayPhoto(img_lib.Image? photo) {
+    if (photo == null) {
+      return const Icon(Icons.no_photography_outlined);
     } else {
       return ClipOval(
-        child: Image.memory(Uint8List.fromList(
-          img_lib.encodePng(img),
-        )),
+        child: Image.memory(Uint8List.fromList(img_lib.encodePng(photo))),
       );
     }
   }

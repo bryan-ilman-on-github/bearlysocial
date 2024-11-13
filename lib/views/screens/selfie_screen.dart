@@ -1,12 +1,13 @@
+// ignore_for_file: camel_case_types
+
 import 'dart:async';
 import 'dart:math';
 
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/screen_size_pod.dart';
+import 'package:bearlysocial/utils/cam_util.dart';
 import 'package:bearlysocial/utils/fs_util.dart';
-import 'package:bearlysocial/utils/selfie_util.dart';
 import 'package:bearlysocial/views/buttons/cancel_btn.dart';
-import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/views/texts/animated_elliptical_txt.dart';
 import 'package:camera/camera.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -17,6 +18,8 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
 
 part 'package:bearlysocial/views/lines/camera_frame.dart';
+
+typedef fs_util = FileSystemUtility;
 
 class SelfieScreen extends ConsumerStatefulWidget {
   final CameraDescription frontCamera;
@@ -41,13 +44,13 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
 
   late _Position _cancelButtonPosition;
 
-  Face? _prevDetectedFace;
+  Face? _prevFace;
   bool _isDetecting = false;
 
-  Timer? _focusTimer;
-  bool _settingFocus = false;
+  Timer? _autoFocusTimer;
+  bool _isAdjustingFocus = false;
 
-  XFile? _selfie;
+  XFile? _capturedImage;
 
   final _faceDetector = GoogleML.vision.faceDetector(
     FaceDetectorOptions(
@@ -63,7 +66,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
     final screenWidth = ref.read(screenSize).width;
     final screenHeight = ref.read(screenSize).height;
 
-    final camFrameSize = SelfieUtility.calculateCamFrameSize();
+    final camFrameSize = CameraUtility.calculateCamFrameSize();
     final camFrameRadius = camFrameSize / 2;
 
     final top = (screenHeight / 2) - (sin(pi / 4) * camFrameRadius) - 24.0;
@@ -109,24 +112,19 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
     _camInit = _camController.initialize().then((_) {
       if (!mounted) return;
 
-      _camController.startImageStream((image) async {
+      _camController.startImageStream((camImage) async {
         if (!_isDetecting) {
           _isDetecting = true; // TODO: check if smooth.
 
-          final Face? nowDetectedFace = await SelfieUtility.detectFace(
-            image: image,
+          final Face? currFace = await CameraUtility.detectFace(
+            camImage: camImage,
             sensorOrientation: widget.frontCamera.sensorOrientation,
             faceDetector: _faceDetector,
           );
 
-          // Check if the detected face is the same as the previously detected face
-          final bool sameFace =
-              _prevDetectedFace?.trackingId == nowDetectedFace?.trackingId;
+          final bool sameFace = _prevFace?.trackingId == currFace?.trackingId;
+          final double? smilingProbability = currFace?.smilingProbability;
 
-          final double? smilingProbability =
-              nowDetectedFace?.smilingProbability;
-
-          // Check if the detected face is smiling with a high probability (98% or more)
           final bool highSmilingProbability =
               smilingProbability != null && smilingProbability >= 0.98;
 
@@ -136,41 +134,32 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
               () => Navigator.pop(context),
             );
 
-            _selfie = await _camController.takePicture();
+            _capturedImage = await _camController.takePicture();
             _camFlash();
 
             await _camController.stopImageStream();
 
-            final String? initialFilePath = _selfie?.path;
+            final String? originalFilePath = _capturedImage?.path;
+            if (originalFilePath == null) return;
 
-            if (initialFilePath == null) {
-              return;
-            }
-
-            final String renamedFilePath =
-                FileSystemUtility.addSuffixToFilePath(
-              filePath: initialFilePath,
+            final String renamedFilePath = fs_util.addSuffixToFilePath(
+              filePath: originalFilePath,
               suffix: '-compressed',
             );
 
             await FlutterImageCompress.compressAndGetFile(
-              initialFilePath,
+              originalFilePath,
               renamedFilePath,
               quality: 16,
             );
 
-            final img_lib.Image? profilePic =
-                await SelfieUtility.buildProfilePic(
-              imagePath: renamedFilePath,
+            final formattedPhoto = await CameraUtility.formatPhoto(
+              photoPath: renamedFilePath,
             );
-
-            widget.onCapture(profilePic);
+            widget.onCapture(formattedPhoto);
           }
 
-          setState(() {
-            _prevDetectedFace = nowDetectedFace;
-          });
-
+          setState(() => _prevFace = currFace);
           _isDetecting = false;
         }
       });
@@ -208,7 +197,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
               Column(
                 children: [
                   Expanded(
-                    child: _prevDetectedFace == null
+                    child: _prevFace == null
                         ? AnimatedEllipticalText(
                             controller: _looper,
                             textStyle: whiteTextStyle,
@@ -224,15 +213,16 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
                   Expanded(
                     flex: 2,
                     child: _CameraFrame(
-                      color:
-                          _settingFocus ? AppColor.lightYellow : Colors.white,
-                      gapSize: _prevDetectedFace == null
+                      color: _isAdjustingFocus
+                          ? AppColor.lightYellow
+                          : Colors.white,
+                      gapSize: _prevFace == null
                           ? MarginSize.veryLarge
                           : MarginSize.verySmall / 10,
                     ),
                   ),
                   Expanded(
-                    child: _settingFocus
+                    child: _isAdjustingFocus
                         ? AnimatedEllipticalText(
                             controller: _looper,
                             textStyle: whiteTextStyle,
@@ -243,7 +233,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
                 ],
               ),
               GestureDetector(
-                onTapUp: (TapUpDetails details) {
+                onTapUp: (details) {
                   final RenderBox renderBox =
                       context.findRenderObject() as RenderBox;
 
@@ -256,14 +246,14 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
                   );
 
                   _camController.setFocusPoint(relativePoint);
-                  setState(() => _settingFocus = true);
+                  setState(() => _isAdjustingFocus = true);
 
-                  _focusTimer?.cancel();
-                  _focusTimer = Timer(
+                  _autoFocusTimer?.cancel();
+                  _autoFocusTimer = Timer(
                     const Duration(
                       milliseconds: AnimationDuration.slow * 2,
                     ),
-                    () => setState(() => _settingFocus = false),
+                    () => setState(() => _isAdjustingFocus = false),
                   );
                 },
               ),
