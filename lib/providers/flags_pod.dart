@@ -18,6 +18,8 @@ _flagPod _createFlagPod(bool flag) {
 
 final _authFlagPod = //
     _createFlagPod(false);
+final _darkModeFlagPod = //
+    _createFlagPod(false);
 final _profileSaveFlagPod = //
     _createFlagPod(true);
 final _loadingPhotoFlagPod = //
@@ -25,6 +27,8 @@ final _loadingPhotoFlagPod = //
 
 final isAuthenticated = //
     Provider((ref) => ref.watch(_authFlagPod));
+final isDarkModeEnabled = //
+    Provider((ref) => ref.watch(_darkModeFlagPod));
 final isProfileSaved = //
     Provider((ref) => ref.watch(_profileSaveFlagPod));
 final isLoadingPhoto = //
@@ -36,3 +40,6 @@ final setProfileSaveFlag =
     Provider((ref) => ref.read(_profileSaveFlagPod.notifier).setState);
 final setLoadingPhotoFlag =
     Provider((ref) => ref.read(_loadingPhotoFlagPod.notifier).setState);
+
+final toggleDarkMode = //
+    Provider((ref) => ref.read(_darkModeFlagPod.notifier).toggleState);

@@ -86,16 +86,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: DatabaseKey.last_name.name,
     );
 
-    ref.read(setInterests)(
-      jsonDecode(LocalDatabaseUtility.retrieveTransaction(
-        key: DatabaseKey.interests.name,
-      )).cast<String>(),
-    );
-    ref.read(setLangs)(
-      jsonDecode(LocalDatabaseUtility.retrieveTransaction(
-        key: DatabaseKey.langs.name,
-      )).cast<String>(),
-    );
+    // ref.read(setInterests)(
+    //   jsonDecode(LocalDatabaseUtility.retrieveTransaction(
+    //     key: DatabaseKey.interests.name,
+    //   )).cast<String>(),
+    // );
+    // ref.read(setLangs)(
+    //   jsonDecode(LocalDatabaseUtility.retrieveTransaction(
+    //     key: DatabaseKey.langs.name,
+    //   )).cast<String>(),
+    // );
 
     _interestController.text = TextSymbol.emptyString;
     _langController.text = TextSymbol.emptyString;
@@ -110,9 +110,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       key: DatabaseKey.linkedin_handle.name,
     );
 
-    ref.read(setSchedule)(SplayTreeMap.from(jsonDecode(
-      LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.schedule.name),
-    )));
+    // ref.read(setSchedule)(SplayTreeMap.from(jsonDecode(
+    //   LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.schedule.name),
+    // )));
 
     ref.read(setLoadingPhotoFlag)(false);
     ref.read(setProfileSaveFlag)(true);
@@ -247,7 +247,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         child: Column(
           children: [
             const Align(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.topRight,
               child: WarningMessage(),
             ),
             const SizedBox(height: WhiteSpaceSize.verySmall),

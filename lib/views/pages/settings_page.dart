@@ -1,5 +1,4 @@
 import 'package:bearlysocial/providers/flags_pod.dart';
-import 'package:bearlysocial/providers/theme_pod.dart';
 import 'package:bearlysocial/views/buttons/setting_btn.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
@@ -52,10 +51,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              height: (_settingButtonHeight ?? 0) / 1.25, // arbitrary
+              height: (_settingButtonHeight ?? 0) / 1.25,
               child: DayNightSwitch(
-                value: false,
-                onChanged: (_) {},
+                value: ref.read(isDarkModeEnabled),
+                onChanged: (_) => ref.read(toggleDarkMode)(),
               ),
             ),
             const SizedBox(

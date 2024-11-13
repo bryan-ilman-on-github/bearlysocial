@@ -10,12 +10,10 @@ class WarningMessage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, var ref) {
     return Text(
-      ref.watch(isProfileSaved) ? TextSymbol.emptyString : 'changes not saved',
+      ref.watch(isProfileSaved) ? '' : 'Changes are not yet saved.',
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontSize: TextSize.medium,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.2,
-            wordSpacing: 0.2,
+            letterSpacing: 0.0,
+            wordSpacing: 0.0,
           ),
     );
   }

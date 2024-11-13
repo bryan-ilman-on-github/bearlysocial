@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class Tag extends StatelessWidget {
   final String label;
-  final Function removeSelf;
+  final void Function() removeSelf;
 
   const Tag({
     super.key,
@@ -14,7 +14,7 @@ class Tag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: removeSelf(), // TODO: check this.
+      onTap: removeSelf, // TODO: check this.
       child: Container(
         padding: const EdgeInsets.all(PaddingSize.verySmall),
         decoration: BoxDecoration(
