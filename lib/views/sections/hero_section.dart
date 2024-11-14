@@ -1,12 +1,12 @@
-import 'package:bearlysocial/views/buttons/splash_btn.dart';
-import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
-import 'package:bearlysocial/views/lines/progress_spinner.dart';
 import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/http_methods.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/providers/txts_pod.dart';
 import 'package:bearlysocial/utils/cloud_util.dart';
+import 'package:bearlysocial/views/buttons/splash_btn.dart';
+import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
+import 'package:bearlysocial/views/lines/progress_spinner.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,18 +21,15 @@ class HeroSection extends ConsumerStatefulWidget {
 class _HeroSectionState extends ConsumerState<HeroSection> {
   bool _canInvokeCallback = true;
 
-  final FocusNode _emailAddrFocusNode = FocusNode();
-  final TextEditingController _emailAddrController = TextEditingController();
+  final _emailAddrFocusNode = FocusNode();
+  final _emailAddrController = TextEditingController();
 
   String? _emailAddrErrTxt;
 
   @override
   void initState() {
     super.initState();
-
-    _emailAddrFocusNode.addListener(() {
-      setState(() {});
-    });
+    _emailAddrFocusNode.addListener(() => setState(() {}));
   }
 
   @override
@@ -42,7 +39,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
   }
 
   void _requestOTP() async {
-    final String emailAddr = _emailAddrController.text;
+    final emailAddr = _emailAddrController.text;
 
     await CloudUtility.sendRequest(
       endpoint: DigitalOceanDropletURL.requestOTP,
@@ -51,15 +48,11 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
         'email_address': emailAddr,
       },
       onSuccess: (_) {
-        setState(() {
-          _emailAddrErrTxt = null;
-        });
+        setState(() => _emailAddrErrTxt = null);
         ref.read(setAuthEmailAddr)(emailAddr);
       },
       onBadRequest: (response) {
-        setState(() {
-          _emailAddrErrTxt = response['message'];
-        });
+        setState(() => _emailAddrErrTxt = response['message']);
       },
     );
 
@@ -67,7 +60,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     return Column(
       children: [
         Row(
@@ -76,7 +69,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
               flex: 80,
               child: Text(
                 'Step in and explore!',
-                maxLines: 2,
+                maxLines: 4,
                 style: Theme.of(context).textTheme.displayLarge,
               ),
             ),

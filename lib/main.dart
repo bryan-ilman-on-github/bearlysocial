@@ -68,7 +68,7 @@ class _AppEntryState extends ConsumerState<AppEntry> {
       locale: context.locale,
       home: _loading
           ? const LoadingPage()
-          : !ref.watch(isAuthenticated)
+          : ref.watch(isAuthenticated)
               ? const SessionPage()
               : const AuthPage(),
       scrollBehavior: const BouncingScroll(),

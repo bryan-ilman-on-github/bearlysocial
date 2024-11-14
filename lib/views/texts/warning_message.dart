@@ -1,5 +1,3 @@
-import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/constants/txt_sym.dart';
 import 'package:bearlysocial/providers/flags_pod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,9 +6,9 @@ class WarningMessage extends ConsumerWidget {
   const WarningMessage({super.key});
 
   @override
-  Widget build(BuildContext context, var ref) {
+  Widget build(context, ref) {
     return Text(
-      ref.watch(isProfileSaved) ? '' : 'Changes are not yet saved.',
+      ref.watch(isProfileSaved) ? '' : 'Changes not saved yet.',
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
             letterSpacing: 0.0,
             wordSpacing: 0.0,

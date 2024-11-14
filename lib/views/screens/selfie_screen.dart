@@ -200,7 +200,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
                   Expanded(
                     child: _prevFace == null
                         ? AnimatedEllipticalText(
-                            controller: _looper,
+                            looper: _looper,
                             textStyle: whiteTextStyle,
                             leadingText: 'Scanning facial features',
                           )
@@ -225,7 +225,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
                   Expanded(
                     child: _isAdjustingFocus
                         ? AnimatedEllipticalText(
-                            controller: _looper,
+                            looper: _looper,
                             textStyle: whiteTextStyle,
                             leadingText: 'Adjusting focus',
                           )
