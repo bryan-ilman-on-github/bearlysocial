@@ -42,7 +42,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
   late CameraController _camController;
   late Future<void> _camInit;
 
-  late _Position _cancelButtonPosition;
+  _Position? _cancelButtonPosition;
 
   Face? _prevFace;
   bool _isDetecting = false;
@@ -164,6 +164,9 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
         }
       });
     });
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _updateCancelButtonPosition());
   }
 
   @override
@@ -177,8 +180,6 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
 
   @override
   Widget build(BuildContext context) {
-    _updateCancelButtonPosition();
-
     final whiteTextStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: TextSize.large,
           color: Colors.white,
@@ -257,10 +258,11 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
                   );
                 },
               ),
-              CancelButton(
-                top: _cancelButtonPosition.top,
-                right: _cancelButtonPosition.right,
-              ),
+              if (_cancelButtonPosition != null)
+                CancelButton(
+                  top: _cancelButtonPosition?.top,
+                  right: _cancelButtonPosition?.right,
+                ),
             ],
           );
         },
