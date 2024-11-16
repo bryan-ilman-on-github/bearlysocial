@@ -3,7 +3,6 @@ import 'package:bearlysocial/views/buttons/setting_btn.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
-import 'package:day_night_themed_switch/day_night_themed_switch.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,16 +49,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: (_settingButtonHeight ?? 0) / 1.25,
-              child: DayNightSwitch(
-                value: ref.read(isDarkModeEnabled),
-                onChanged: (_) => ref.read(toggleDarkMode)(),
-              ),
-            ),
-            const SizedBox(
-              height: WhiteSpaceSize.small,
-            ),
             SettingButton(
               key: _settingButtonKey,
               icon: Icons.translate,

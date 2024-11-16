@@ -6,7 +6,6 @@ import 'package:bearlysocial/utils/theme_util.dart';
 import 'package:bearlysocial/views/pages/auth_page.dart';
 import 'package:bearlysocial/views/pages/loading_page.dart';
 import 'package:bearlysocial/views/pages/session_page.dart';
-import 'package:bearlysocial/views/screens/splash_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,25 +54,22 @@ class _AppEntryState extends ConsumerState<AppEntry> {
   @override
   void initState() {
     super.initState();
-
-    // ref.read(storeNetworkInfo)().then((_) => setState(() => _loading = false));
   }
 
   @override
   Widget build(context) {
     return MaterialApp(
       title: 'BearlySocial',
-      theme: ThemeUtility.createTheme(ref.watch(isDarkModeEnabled)),
+      theme: ThemeUtility.createTheme(),
+      darkTheme: ThemeUtility.createTheme(dark: true),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: SplashScreen(
-        nextScreen: _loading
-            ? const LoadingPage()
-            : ref.watch(isAuthenticated)
-                ? const SessionPage()
-                : const AuthPage(),
-      ),
+      home: _loading
+          ? const LoadingPage()
+          : ref.watch(isAuthenticated)
+              ? const SessionPage()
+              : const AuthPage(),
       scrollBehavior: const BouncingScroll(),
     );
   }

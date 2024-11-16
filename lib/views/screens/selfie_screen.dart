@@ -52,7 +52,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
 
   XFile? _capturedImage;
 
-  final _faceDetector = GoogleML.vision.faceDetector(
+  final _faceDetector = GoogleMl.vision.faceDetector(
     FaceDetectorOptions(
       performanceMode: FaceDetectorMode.accurate,
       enableClassification: true,

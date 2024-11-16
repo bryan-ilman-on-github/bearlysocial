@@ -9,20 +9,20 @@ late Color? //
     _indicatorColor;
 
 class ThemeUtility {
-  static ThemeData createTheme(bool darkModeEnabled) {
+  static ThemeData createTheme({bool dark = false}) {
     _backgroundColor = //
-        darkModeEnabled ? AppColor.heavyGray : Colors.white;
+        dark ? AppColor.heavyGray : Colors.white;
     _highlightColor = //
-        darkModeEnabled ? AppColor.moderateGray : AppColor.lightGray;
+        dark ? AppColor.moderateGray : AppColor.lightGray;
     _normalColor = //
-        darkModeEnabled ? AppColor.lightGray : AppColor.moderateGray;
+        dark ? AppColor.lightGray : AppColor.moderateGray;
     _focusColor = //
-        darkModeEnabled ? Colors.white : AppColor.heavyGray;
+        dark ? Colors.white : AppColor.heavyGray;
     _indicatorColor = //
-        darkModeEnabled ? AppColor.lightBlue : AppColor.heavyBlue;
+        dark ? AppColor.lightBlue : AppColor.heavyBlue;
 
     return ThemeData(
-      primaryColor: AppColor.primary, // TODO: check.
+      primaryColor: AppColor.primary,
       scaffoldBackgroundColor: _backgroundColor,
       dividerColor: _normalColor,
       focusColor: _focusColor,
