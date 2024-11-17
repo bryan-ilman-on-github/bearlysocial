@@ -2,9 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bearlysocial/aliases/URI.dart';
+import 'package:bearlysocial/constants/db_key.dart';
+import 'package:bearlysocial/providers/statuses_pod.dart';
+import 'package:bearlysocial/utils/local_db_util.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:http_status_code/http_status_code.dart';
+
+final _ref = ProviderContainer();
 
 /// This class provides utility functions for handling cloud-related operations.
 class CloudUtility {
@@ -37,7 +43,8 @@ class CloudUtility {
   }) async {
     var url = URI.parse(endpoint);
 
-    String token = 'your-token-from-database'; // TODO: from local storage
+    String token =
+        LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.token.name);
 
     http.BaseRequest request;
 
@@ -71,7 +78,7 @@ class CloudUtility {
     } else if (response.statusCode == StatusCode.BAD_REQUEST) {
       onBadRequest(response);
     } else if (response.statusCode == StatusCode.UNAUTHORIZED) {
-      // TODO: Log the user out of the app.
+      _ref.read(setAuthStatus)(false);
     } else {
       // TODO: Display a full-screen modal indicating an internal server error.
     }

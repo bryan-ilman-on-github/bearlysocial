@@ -9,13 +9,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img_lib;
 
-final ref = ProviderContainer();
+final _ref = ProviderContainer();
 
 late double screenWidth, screenHeight;
 
 void _updateScreenSize() {
-  screenWidth = ref.read(screenSize).width;
-  screenHeight = ref.read(screenSize).height;
+  screenWidth = _ref.read(screenSize).width;
+  screenHeight = _ref.read(screenSize).height;
 }
 
 class CameraUtility {
@@ -89,8 +89,8 @@ class CameraUtility {
     required List<Face> faces,
     required Size camImageSize,
   }) {
-    final screenWidth = ref.read(screenSize).width;
-    final screenHeight = ref.read(screenSize).height;
+    final screenWidth = _ref.read(screenSize).width;
+    final screenHeight = _ref.read(screenSize).height;
 
     final screenCenter = Offset(screenWidth / 2, screenHeight / 2);
 

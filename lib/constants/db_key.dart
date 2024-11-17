@@ -1,5 +1,4 @@
 enum DatabaseKey {
-  darkModeEnabled,
   uid,
   token,
   photo,

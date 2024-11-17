@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/providers/statuses_pod.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/cloud_urls.dart';
 import 'package:bearlysocial/constants/db_key.dart';
@@ -60,7 +60,7 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
           ),
         );
 
-        ref.read(setAuthFlag)(true);
+        ref.read(setAuthStatus)(true);
         ref.read(setAuthEmailAddr)('');
       },
       onBadRequest: (response) {

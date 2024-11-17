@@ -9,7 +9,7 @@ import 'package:bearlysocial/constants/native_lang_name.dart';
 import 'package:bearlysocial/constants/social_media_consts.dart';
 import 'package:bearlysocial/constants/translation_key.dart';
 import 'package:bearlysocial/constants/txt_sym.dart';
-import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/providers/statuses_pod.dart';
 import 'package:bearlysocial/providers/foci_pod.dart';
 import 'package:bearlysocial/providers/imgs_pod.dart';
 import 'package:bearlysocial/providers/lists_pod.dart';
@@ -63,12 +63,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _trackProfileChanges(List<TextEditingController> controllers) {
     for (var c in controllers) {
       // TODO: Improve the 'changes not saved' message handling here.
-      c.addListener(() => ref.read(setProfileSaveFlag)(false));
+      c.addListener(() => ref.read(setProfileSaveStatus)(false));
     }
   }
 
   void _syncWithDatabase() async {
-    ref.read(setLoadingPhotoFlag)(true);
+    ref.read(setLoadingPhotoStatus)(true);
 
     await Future.delayed(Duration(seconds: 10)); // TODO: check this!
 
@@ -114,8 +114,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     //   LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.schedule.name),
     // )));
 
-    ref.read(setLoadingPhotoFlag)(false);
-    ref.read(setProfileSaveFlag)(true);
+    ref.read(setLoadingPhotoStatus)(false);
+    ref.read(setProfileSaveStatus)(true);
 
     _canResetChanges = true;
     _canApplyChanges = true;
@@ -130,7 +130,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ref.read(addInterest)(_interestController.text);
       _interestController.text = TextSymbol.emptyString;
 
-      ref.read(setProfileSaveFlag)(false);
+      ref.read(setProfileSaveStatus)(false);
     }
   }
 
@@ -141,18 +141,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ref.read(addLang)(_langController.text);
       _langController.text = TextSymbol.emptyString;
 
-      ref.read(setProfileSaveFlag)(false);
+      ref.read(setProfileSaveStatus)(false);
     }
   }
 
   void _removeInterest(String entry) {
     ref.read(removeInterest)(entry);
-    ref.read(setProfileSaveFlag)(false);
+    ref.read(setProfileSaveStatus)(false);
   }
 
   void _removeLang(String entry) {
     ref.read(removeLang)(entry);
-    ref.read(setProfileSaveFlag)(false);
+    ref.read(setProfileSaveStatus)(false);
   }
 
   Future<CameraDescription?> _getFrontCamera() async {
@@ -176,10 +176,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               frontCamera: frontCamera,
               onCapture: (optionalPhoto) {
                 // TODO: check if all is smooth.
-                ref.read(setLoadingPhotoFlag)(true);
+                ref.read(setLoadingPhotoStatus)(true);
                 ref.read(setPhoto)(optionalPhoto);
-                ref.read(setLoadingPhotoFlag)(false);
-                ref.read(setProfileSaveFlag)(false);
+                ref.read(setLoadingPhotoStatus)(false);
+                ref.read(setProfileSaveStatus)(false);
               },
             ),
             transitionDuration: const Duration(

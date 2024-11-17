@@ -1,4 +1,4 @@
-import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/providers/statuses_pod.dart';
 import 'package:bearlysocial/views/buttons/setting_btn.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/constants/design_tokens.dart';
@@ -67,7 +67,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
             SplashButton(
               verticalPadding: PaddingSize.small,
-              callbackFunction: () => ref.read(setAuthFlag)(false),
+              callbackFunction: () => ref.read(setAuthStatus)(false),
               buttonColor: Colors.transparent,
               borderColor: AppColor.heavyRed,
               borderRadius: BorderRadius.circular(

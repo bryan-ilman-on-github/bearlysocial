@@ -1,5 +1,5 @@
 import 'package:bearlysocial/constants/design_tokens.dart';
-import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/providers/statuses_pod.dart';
 import 'package:bearlysocial/providers/imgs_pod.dart';
 import 'package:bearlysocial/utils/cam_util.dart';
 import 'package:bearlysocial/views/lines/progress_spinner.dart';

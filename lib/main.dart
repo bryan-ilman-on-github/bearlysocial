@@ -1,6 +1,9 @@
 import 'dart:async';
 
-import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/constants/cloud_urls.dart';
+import 'package:bearlysocial/constants/http_methods.dart';
+import 'package:bearlysocial/providers/statuses_pod.dart';
+import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/utils/conn_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/motion_util.dart';
@@ -56,7 +59,7 @@ class AppEntry extends ConsumerStatefulWidget {
 class _AppEntryState extends ConsumerState<AppEntry> {
   StreamSubscription<List<ConnectivityResult>>? subscription;
 
-  bool _loading = false;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -70,6 +73,15 @@ class _AppEntryState extends ConsumerState<AppEntry> {
         ConnectivityUtility.hideBanner();
       }
     });
+
+    CloudUtility.sendRequest(
+      endpoint: DigitalOceanDropletURL.validateToken,
+      method: HTTPmethod.GET.name,
+      onSuccess: (_) => ref.read(setAuthStatus)(true),
+      onBadRequest: (_) => ref.read(setAuthStatus)(false),
+    ).then(
+      (_) => setState(() => _loading = false),
+    );
   }
 
   @override
@@ -91,7 +103,7 @@ class _AppEntryState extends ConsumerState<AppEntry> {
       locale: context.locale,
       home: _loading
           ? const LoadingPage()
-          : !ref.watch(isAuthenticated)
+          : ref.watch(isAuthenticated)
               ? const SessionPage()
               : const AuthPage(),
       scrollBehavior: const BouncingScroll(),
