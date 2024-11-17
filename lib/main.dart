@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bearlysocial/internet.dart';
 import 'package:bearlysocial/providers/flags_pod.dart';
+import 'package:bearlysocial/utils/conn_util.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
 import 'package:bearlysocial/utils/motion_util.dart';
 import 'package:bearlysocial/utils/settings_util.dart';
@@ -55,7 +55,6 @@ class AppEntry extends ConsumerStatefulWidget {
 
 class _AppEntryState extends ConsumerState<AppEntry> {
   StreamSubscription<List<ConnectivityResult>>? subscription;
-  bool isInternetConnected = true;
 
   bool _loading = false;
 
@@ -63,12 +62,12 @@ class _AppEntryState extends ConsumerState<AppEntry> {
   void initState() {
     super.initState();
 
-    subscription = Connectivity().onConnectivityChanged.listen((result) async {
-      bool isConnected = await InternetConnectionChecker().hasConnection;
-      if (!isConnected) {
-        InternetBannerOverlay.showBanner();
+    subscription = Connectivity().onConnectivityChanged.listen((_) async {
+      bool hasConnection = await InternetConnectionChecker().hasConnection;
+      if (!hasConnection) {
+        ConnectivityUtility.showBanner();
       } else {
-        InternetBannerOverlay.hideBanner();
+        ConnectivityUtility.hideBanner();
       }
     });
   }
@@ -76,25 +75,27 @@ class _AppEntryState extends ConsumerState<AppEntry> {
   @override
   dispose() {
     subscription?.cancel();
-    InternetBannerOverlay.hideBanner(); // Clean up the banner
+    ConnectivityUtility.hideBanner();
+
     super.dispose();
   }
 
   @override
   Widget build(context) {
     return MaterialApp(
-        title: 'BearlySocial',
-        theme: ThemeUtility.createTheme(),
-        darkTheme: ThemeUtility.createTheme(dark: true),
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        home: _loading
-            ? const LoadingPage()
-            : !ref.watch(isAuthenticated)
-                ? const SessionPage()
-                : const AuthPage(),
-        scrollBehavior: const BouncingScroll(),
-        navigatorKey: InternetBannerOverlay.navigatorKey);
+      title: 'BearlySocial',
+      theme: ThemeUtility.createTheme(),
+      darkTheme: ThemeUtility.createTheme(dark: true),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      home: _loading
+          ? const LoadingPage()
+          : !ref.watch(isAuthenticated)
+              ? const SessionPage()
+              : const AuthPage(),
+      scrollBehavior: const BouncingScroll(),
+      navigatorKey: ConnectivityUtility.navigatorKey,
+    );
   }
 }
