@@ -114,7 +114,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
 
       _camController.startImageStream((camImage) async {
         if (!_isDetecting) {
-          _isDetecting = true; // TODO: check if smooth.
+          _isDetecting = true;
 
           final Face? currFace = await CameraUtility.detectFace(
             camImage: camImage,
@@ -150,7 +150,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen>
             await FlutterImageCompress.compressAndGetFile(
               originalFilePath,
               renamedFilePath,
-              quality: 16,
+              quality: 64,
             );
 
             final formattedPhoto = await CameraUtility.formatPhoto(

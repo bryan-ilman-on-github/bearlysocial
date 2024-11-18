@@ -70,13 +70,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _syncWithDatabase() async {
     ref.read(setLoadingPhotoStatus)(true);
 
-    await Future.delayed(Duration(seconds: 10)); // TODO: check this!
+    await Future.delayed(const Duration(
+      milliseconds: AnimationDuration.medium,
+    ));
 
     String photoBytes =
         LocalDatabaseUtility.retrieveTransaction(key: DatabaseKey.photo.name);
 
     if (photoBytes.isNotEmpty) {
       ref.read(setPhoto)(img_lib.decodeImage(base64Decode(photoBytes)));
+    } else {
+      ref.read(setPhoto)(null);
     }
 
     _firstNameController.text = LocalDatabaseUtility.retrieveTransaction(
@@ -174,9 +178,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           PageRouteBuilder(
             pageBuilder: (_, p, q) => SelfieScreen(
               frontCamera: frontCamera,
-              onCapture: (optionalPhoto) {
-                // TODO: check if all is smooth.
+              onCapture: (optionalPhoto) async {
                 ref.read(setLoadingPhotoStatus)(true);
+                await Future.delayed(const Duration(
+                  milliseconds: AnimationDuration.medium,
+                ));
                 ref.read(setPhoto)(optionalPhoto);
                 ref.read(setLoadingPhotoStatus)(false);
                 ref.read(setProfileSaveStatus)(false);

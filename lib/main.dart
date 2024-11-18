@@ -59,7 +59,7 @@ class AppEntry extends ConsumerStatefulWidget {
 class _AppEntryState extends ConsumerState<AppEntry> {
   StreamSubscription<List<ConnectivityResult>>? subscription;
 
-  bool _loading = true;
+  bool _loading = false;
 
   @override
   void initState() {
