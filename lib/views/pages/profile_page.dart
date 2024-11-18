@@ -247,7 +247,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         child: Column(
           children: [
             const Align(
-              alignment: Alignment.topRight,
+              alignment: Alignment.topLeft,
               child: WarningMessage(),
             ),
             const SizedBox(height: WhiteSpaceSize.verySmall),

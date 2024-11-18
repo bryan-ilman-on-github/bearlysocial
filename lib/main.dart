@@ -76,7 +76,8 @@ class _AppEntryState extends ConsumerState<AppEntry> {
 
     CloudUtility.sendRequest(
       endpoint: DigitalOceanDropletURL.validateToken,
-      method: HTTPmethod.GET.name,
+      method: HTTPmethod.POST.name,
+      context: context,
       onSuccess: (_) => ref.read(setAuthStatus)(true),
       onBadRequest: (_) => ref.read(setAuthStatus)(false),
     ).then(

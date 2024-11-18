@@ -3,14 +3,19 @@ import 'dart:io';
 
 import 'package:bearlysocial/aliases/URI.dart';
 import 'package:bearlysocial/constants/db_key.dart';
+import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/providers/statuses_pod.dart';
 import 'package:bearlysocial/utils/local_db_util.dart';
+import 'package:bearlysocial/views/sheets/bottom_sheet.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:http_status_code/http_status_code.dart';
 
 final _ref = ProviderContainer();
+typedef Anchor = BuildContext;
 
 /// This class provides utility functions for handling cloud-related operations.
 class CloudUtility {
@@ -38,6 +43,7 @@ class CloudUtility {
     required String method,
     Map<String, dynamic>? body,
     File? image,
+    required Anchor context,
     required Function onSuccess,
     required Function onBadRequest,
   }) async {
@@ -80,7 +86,36 @@ class CloudUtility {
     } else if (response.statusCode == StatusCode.UNAUTHORIZED) {
       _ref.read(setAuthStatus)(false);
     } else {
-      // TODO: Display a full-screen modal indicating an internal server error.
+      if (!context.mounted) return;
+
+      showModalBottomSheet(
+        context: context,
+        useSafeArea: true,
+        isScrollControlled: true,
+        builder: (context) {
+          return DismissibleBottomSheet(
+            title: "Internal Server Error",
+            content: Column(
+              children: [
+                SvgPicture.asset(
+                  'assets/svgs/server_error_icon.svg',
+                  width: SideSize.large / 1.6,
+                  height: SideSize.large / 1.6,
+                  color: Theme.of(context).focusColor,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(PaddingSize.large),
+                  child: Text(
+                    'Oops! Something went wrong on our end. Please wait a bit and try again later. Thanks for your patience!',
+                    maxLines: 16,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
   }
 

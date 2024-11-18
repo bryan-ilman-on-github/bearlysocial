@@ -16,57 +16,64 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   @override
   Widget build(context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: PaddingSize.large),
+      body: SafeArea(
         child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 512.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: SideSize.medium,
-                  height: SideSize.medium,
-                  decoration: BoxDecoration(
-                    image: const DecorationImage(
-                      image: AssetImage('assets/pngs/bearlysocial_icon.png'),
-                    ),
-                    boxShadow: [Shadow.medium],
-                  ),
-                ),
-                const SizedBox(height: WhiteSpaceSize.small),
-                Stack(
-                  children: <Widget>[
-                    AnimatedOpacity(
-                      opacity: ref.watch(authEmailAddr).isEmpty ? 1.0 : 0.0,
-                      duration: const Duration(
-                        milliseconds: AnimationDuration.medium,
-                      ),
-                      child: const HeroSection(),
-                    ),
-                    AnimatedOpacity(
-                      opacity: ref.watch(authEmailAddr).isNotEmpty ? 1.0 : 0.0,
-                      duration: const Duration(
-                        milliseconds: AnimationDuration.medium,
-                      ),
-                      child: AnimatedContainer(
-                        duration: const Duration(
-                          milliseconds: AnimationDuration.medium,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: PaddingSize.large),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 512.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: SideSize.medium,
+                      height: SideSize.medium,
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image:
+                              AssetImage('assets/pngs/bearlysocial_icon.png'),
                         ),
-                        transform: Matrix4.translationValues(
-                          ref.watch(authEmailAddr).isNotEmpty
-                              ? 0
-                              : MediaQuery.of(context).size.width / 2,
-                          0,
-                          0,
-                        ),
-                        child: const OTPsection(),
+                        boxShadow: [Shadow.medium],
                       ),
+                    ),
+                    const SizedBox(height: WhiteSpaceSize.small),
+                    Stack(
+                      children: <Widget>[
+                        AnimatedOpacity(
+                          opacity: ref.watch(authEmailAddr).isEmpty ? 1.0 : 0.0,
+                          duration: const Duration(
+                            milliseconds: AnimationDuration.medium,
+                          ),
+                          child: const HeroSection(),
+                        ),
+                        AnimatedOpacity(
+                          opacity:
+                              ref.watch(authEmailAddr).isNotEmpty ? 1.0 : 0.0,
+                          duration: const Duration(
+                            milliseconds: AnimationDuration.medium,
+                          ),
+                          child: AnimatedContainer(
+                            duration: const Duration(
+                              milliseconds: AnimationDuration.medium,
+                            ),
+                            transform: Matrix4.translationValues(
+                              ref.watch(authEmailAddr).isNotEmpty
+                                  ? 0
+                                  : MediaQuery.of(context).size.width / 2,
+                              0,
+                              0,
+                            ),
+                            child: const OTPsection(),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

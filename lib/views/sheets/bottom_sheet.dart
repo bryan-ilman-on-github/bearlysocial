@@ -2,14 +2,14 @@ import 'package:bearlysocial/constants/design_tokens.dart';
 import 'package:bearlysocial/views/lines/horizontal_line.dart';
 import 'package:flutter/material.dart';
 
-/// [BottomSheet] is a [StatelessWidget] that displays a bottom sheet
+/// [DismissibleBottomSheet] is a [StatelessWidget] that displays a bottom sheet
 /// with a title, content, and optional closure widgets.
-class BottomSheet extends StatelessWidget {
+class DismissibleBottomSheet extends StatelessWidget {
   final String title;
   final Widget content;
   final List<Widget>? closure;
 
-  const BottomSheet({
+  const DismissibleBottomSheet({
     super.key,
     required this.title,
     required this.content,

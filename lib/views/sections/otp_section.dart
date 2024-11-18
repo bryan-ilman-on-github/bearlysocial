@@ -34,10 +34,12 @@ class _OTPsectionState extends ConsumerState<OTPsection> {
         'email_address': ref.read(authEmailAddr),
         'otp': _otp.join(),
       },
+      context: context,
       onSuccess: (response) async {
         await CloudUtility.sendRequest(
           endpoint: DigitalOceanSpacesURL.generateURL(response['uid']),
           method: HTTPmethod.GET.name,
+          context: context,
           onSuccess: (photo) {
             LocalDatabaseUtility.insertTransaction(
               key: DatabaseKey.photo.name,

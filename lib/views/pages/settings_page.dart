@@ -42,9 +42,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return SafeArea(
       child: SingleChildScrollView(
         controller: widget.scroller,
-        padding: const EdgeInsets.all(
-          PaddingSize.medium,
-        ),
+        padding: const EdgeInsets.all(PaddingSize.medium),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,

@@ -7,6 +7,7 @@ import 'package:bearlysocial/utils/cloud_util.dart';
 import 'package:bearlysocial/views/buttons/splash_btn.dart';
 import 'package:bearlysocial/views/form_elems/underlined_txt_field.dart';
 import 'package:bearlysocial/views/lines/progress_spinner.dart';
+import 'package:bearlysocial/views/sheets/bottom_sheet.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,6 +48,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
       body: {
         'email_address': emailAddr,
       },
+      context: context,
       onSuccess: (_) {
         setState(() => _emailAddrErrTxt = null);
         ref.read(setAuthEmailAddr)(emailAddr);
